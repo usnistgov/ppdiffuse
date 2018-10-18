@@ -1,4 +1,4 @@
 # ppdiffuse
-Web-based (html and javascript) calculators for voltage-driven transport of polypeptides in nanopores
+Web-based (html and javascript) calculator for voltage-driven transport of polypeptides in nanopores
 
-Run calculator now (./ppdiffuse.html)
+Run calculator (./ppdiffuse.html)
