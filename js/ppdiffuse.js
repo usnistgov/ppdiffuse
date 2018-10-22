@@ -38,6 +38,11 @@ function gaussian(x, x0, sigma) {
 	return math.multiply(math.pow(2*math.PI*math.pow(sigma,2.0), -0.5),math.exp(math.divide(math.subtract(0, math.dotPow(math.subtract(x, x0),2.0)), 2.0*math.pow(sigma, 2.0))));
 }
 
+function gaussian_unnorm(x, x0, sigma) {
+	// return an unnormalized gaussian (value = 1 at x-x0 = 0) with the appropriate x0 and sigma
+	return math.exp(math.divide(math.subtract(0, math.dotPow(math.subtract(x, x0),2.0)), 2.0*math.pow(sigma, 2.0)));
+}
+
 function erf(x, x0, sigma, dx) {
 	var dx = dx || 1.0
 	return cumsum(gaussian(x, x0, sigma), dx)
@@ -101,6 +106,9 @@ function seq2charge(seq, N2C) {
 	//match to amino acid type
 	for (var i=0; i<numarray.length; i++) {
 		switch (numarray[i]) {
+			case 'X':
+				numarray[i] = -2.0;
+				break;
 			case 'D':
 			case 'E':
 				numarray[i] = -1.0;
@@ -170,20 +178,21 @@ function interp(xf, xi, yi) {
 	return (xf.length==1) ? yf[0] : yf
 }
 
-function barrier(V, x, chargedensity, laa, Eb, xb, wb, fu) {
+function barrier(V, x, chargedensity, laa) {
 
 	//var protseq = seq2charge(seq, N2C);
 	//var x = math.multiply(math.range(0, protseq.length).toArray(), laa);
 	var dx = (x[x.length-1] - x[0])/(x.length-1);	
 	Ue = math.multiply(cumsum(chargedensity, dx), e*V/kT, 1.);
 	//document.write(math.min(Ue), '<br>')
-	U = math.add(Ue, math.multiply(1., US(x, laa)), math.multiply(1*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x))
+	//U = math.add(Ue, math.multiply(1., US(x, laa)), math.multiply(1*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x), math.multiply(25, gaussian(x, 5., wb/2.3)))
+	U = math.add(Ue, math.multiply(1., US(x, laa)), get_barrier_components(x, dx))
 	//U = math.add(Ue, math.multiply(1., US1(x, 0.6, 4.0, 2.0)), math.multiply(0*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x))
 	U = math.subtract(U, U[0])
 	return U
 }
 
-function barrier1(V, x, chargedensity, laa, Lp, Ltether, Eb, xb, wb, fu) {
+function barrier1(V, x, chargedensity, laa, Lp, Ltether) {
 
 	//var protseq = seq2charge(seq, N2C);
 	//var x = math.multiply(math.range(0, protseq.length).toArray(), laa);
@@ -192,12 +201,23 @@ function barrier1(V, x, chargedensity, laa, Lp, Ltether, Eb, xb, wb, fu) {
 	//document.write(math.min(Ue), '<br>')	
 	//U = math.add(Ue, math.multiply(1., US(x, laa)), math.multiply(1*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x))
 	entropy = US1(x, Lp, Ltether)
-	U = math.add(Ue, math.multiply(1., entropy[0]), math.multiply(1*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x))
+	//U = math.add(Ue, math.multiply(1., entropy[0]), math.multiply(1*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x))
+	U = math.add(Ue, math.multiply(1., entropy[0]), get_barrier_components(x, dx))
 	x = math.filter(x, function (v, i) {return entropy[1][i]})
 	x = math.subtract(x, x[0])
 	U = math.filter(U, function (v, i) {return entropy[1][i]})
 	U = math.subtract(U, U[0])
 	return [x, U]
+}
+
+function get_barrier_components(x, dx) {
+	U = math.multiply(0., x)
+	$('[id^=panel-]').each(function() {
+		panelid = $(this).attr('id')
+		paneltype = $(this).attr('paneltype')
+		U = math.add(U, elements[$(this).attr('paneltype')].U(panelid, x, dx))
+		})
+	return U
 }
 
 function calcEscapeTime1x(x, x0, U, D, dx) {
@@ -301,6 +321,7 @@ function makeChargeDensityControls(target_id) {
 		exportControls
 		.append("button")
 			.text("Export")
+			.classed("ui-button", true)
 			.attr("id", "btnExportChargeDensity")
 			.on("click", function () {
 					//format data to saveData
@@ -317,6 +338,7 @@ function makePotentialControls(target_id) {
 		exportControls
 		.append("button")
 			.text("Export")
+			.classed("ui-button", true)
 			.attr("id", "btnExportPotential")
 			.on("click", function () {
 					//format data to saveData
@@ -347,33 +369,105 @@ function formatOutput(targetchart) {
 	return output;
 }
 
-
-function makeProfileControls(target_id, initseq) {
-
+function makeGeneralProfileControls(target_id) {
+	
 	  changefunc = update_plots;
+	
+	  var genControls = d3.select("#" + target_id).append('div')
+	    .classed("gencontrols", true)
+      genControls
+//		.append("label")
+//          .text("General parameters: ")
+//		  .style("font-weight", "bold")
+		.append("li")
+		  .text("Diffusion constant (\u03BCm\u00B2/s): ")
+		  .style("font-weight", "normal")
+        .append("input")
+		  .attr("id", "D")
+		  .attr("save", true)
+          .attr("type", "text")
+          .attr("name", "D")
+          .attr("value", 0.4)
+		  .on("change", changefunc)
+/*	  genControls
+		.append("li")
+		  .text(" constant offset force (pN): ")
+		.append("input")
+		  .attr("id", "fu")
+		  .attr("save", true)
+          .attr("type", "text")
+          .attr("name", "fu")
+          .attr("value", 0.0)
+		  .on("change", changefunc) */
+}
 
-      var profControls = d3.select("#" + target_id).append('div')
-          .classed("profcontrols", true)
+function makePoreControls(target_id) {
+	
+	 changefunc = update_plots;
+	
+	 var poreControls = d3.select("#" + target_id).append('div')
+	    .classed("porecontrols", true)
+	  poreControls
+	  	/*.append("label")
+          .text("Pore parameters: ")
+		  .style("font-weight", "bold")*/
+		.append("li")
+		  .text("Length (nm): ")
+		  .style("font-weight", "normal")
+		.append("input")
+		  .attr("id", "Lp")
+		  .attr("save", true)
+          .attr("type", "text")
+          .attr("name", "Lp")
+          .attr("value", 1.2)
+		  .on("change", changefunc)
+	  poreControls
+	  	  .append("li")
+		  .text("Electroosmotic slope: ")
+	      .append("input")
+		  .attr("id", "EOFm")
+		  .attr("save", true)
+          .attr("type", "text")
+          .attr("name", "EOFm")
+          .attr("value", 0.908)
+		  .on("change", changefunc)
+	  poreControls
+   	    .append("li")
+		  .text("Electroosmotic intercept (e/nm): ")
+		.append("input")
+		  .attr("id", "EOFb")
+		  .attr("save", true)
+          .attr("type", "text")
+          .attr("name", "EOFb")
+          .attr("value", -0.18)
+		  .on("change", changefunc)
       
-	  /*profControls.append("button")
-        .text("Calculate")
-        .classed("ui-button ui-corner-all ui-widget", true)		
-        .on("click", update_plots)*/
-      
-	  var seqControls = profControls.append('div')
-          .classed("seqcontrols", true)
+}
+
+function makeSequenceControls(target_id, initseq) {
+	
+	changefunc = update_plots;
+	
+	var seqControls = d3.select("#" + target_id).append('div')
+		.classed("seqcontrols", true)
 	  
 	  seqControls
         .append("label")
 		  .attr("id", "seqlabel")
           .text("Sequence: ")
 	  seqControls
-        .append("input")
+        .append("textarea")
 		  .attr("id", "sequence")
+		  .attr("save", true)
           .attr("type", "text")
           .attr("name", "sequence")
-          .attr("value", initseq)
+          .attr("text", initseq)
+		  //.val(initseq)
 		  .on("change", changefunc)
+		  $("#sequence").val(initseq)
+
+	   seqControls.append("p")
+
 	   seqControls.append("button")
         .text("reverse")
         .classed("ui-button ui-widget", true)		
@@ -384,12 +478,14 @@ function makeProfileControls(target_id, initseq) {
 			changefunc();
 			})
 			
+
 	   seqControls
         .append("label")
 		.attr("id", "seqlabel2")
         .text(" Direction:")
         .append("input")
           .attr("type", "radio")
+		  .attr("save", true)
 		  .attr("name", "seqdir")
 		  .attr("id", "seqdirN2C")
           .property("checked", false)
@@ -401,6 +497,7 @@ function makeProfileControls(target_id, initseq) {
         .text("N->C")
         .append("input")
           .attr("type", "radio")
+		  .attr("save", true)
           .property("checked", true)
 		  .attr("name", "seqdir")
 		  .attr("id", "seqdirC2N")		  
@@ -409,67 +506,140 @@ function makeProfileControls(target_id, initseq) {
 		 seqControls
 		 .append("label")
 		 .attr("id", "seqlabel4")
-		 .text("C->N")
-		 
-	  var genControls = d3.select("#" + target_id).append('div')
-	    .classed("gencontrols", true)
-      genControls
+		 .text("C->N") 
+}
+
+function makeGeneralAccordionControls(target_id) {
+
+	changefunc = update_plots;
+	
+	var accControls = d3.select("#" + target_id + "_topleft")
+	
+	accControls
+		.append("button")
+			.text("Add new: ")
+			.classed("ui-button", true)		
+			.attr("id", "addelement")
+			.style("background", "#ffff99")
+			.on("click", function () {
+				
+				var newlist = new Array()
+				$('.ui-accordion-header').each(function() {newlist.push($(this).attr('id').split('-').slice(-1)[0])})
+				if (newlist.length == 0) {newlist = ["-1"]}
+				var nextnum = (Number(newlist.slice(-1)[0]) + 1).toString()
+				var panelid = "panel-" + nextnum
+				var newtype = $("#new_element_type").val()
+	
+				makeNewPanel(panelid, newtype)
+				
+				})
+	accControls
+		/*.append("label")
+          .text(" Type: ")
+		  //.style("font-weight", "bold")*/
+		.append("select")
+		  .classed("ui-button", true)
+		  //.style("background", "#ffff99")
+		  .attr("id", "new_element_type")
+		  .selectAll("option")
+		  .data($.map(elements, function (v, k) {return v.label;}))
+		  .enter().append("option")
+		    .text(function (d) {return d;})
+			
+		//$("#new_element_type").selectmenu()
+
+	var accControls = d3.select("#" + target_id + "_topright")
+	
+	accControls
 		.append("label")
-          .text("General parameters: ")
-		  .style("font-weight", "bold")
-		.append("label")
-		  .text("D (\u03BCm\u00B2/s): ")
-		  .style("font-weight", "normal")
-        .append("input")
-		  .attr("id", "D")
-          .attr("type", "text")
-          .attr("name", "D")
-          .attr("value", 0.4)
-		  .on("change", changefunc)
-	  genControls
-		.append("label")
-		  .text(" constant offset force (pN): ")
+		.text("Configuration: ")
+		.append("button")
+		.text("Save")
+		.classed("ui-button", true)		
+		.on("click", saveConfig)
+	accControls
 		.append("input")
-		  .attr("id", "fu")
-          .attr("type", "text")
-          .attr("name", "fu")
-          .attr("value", 0.0)
-		  .on("change", changefunc)
-	  
-	  var poreControls = d3.select("#" + target_id).append('div')
-	    .classed("porecontrols", true)
-	  poreControls
-	  	.append("label")
-          .text("Pore parameters: ")
-		  .style("font-weight", "bold")
-		.append("label")
-		  .text(" length (nm): ")
-		  .style("font-weight", "normal")
-		.append("input")
-		  .attr("id", "Lp")
-          .attr("type", "text")
-          .attr("name", "Lp")
-          .attr("value", 1.2)
-		  .on("change", changefunc)
-	  poreControls
-	  	  .append("label")
-		  .text(" Electroosmotic slope: ")
-		.append("input")
-		  .attr("id", "EOFm")
-          .attr("type", "text")
-          .attr("name", "EOFm")
-          .attr("value", 0.908)
-		  .on("change", changefunc)
-		  
-	  poreControls
-	  	  .append("label")
-		  .text(" intercept (e/nm): ")
-		.append("input")
-		  .attr("id", "EOFb")
-          .attr("type", "text")
-          .attr("name", "EOFb")
-          .attr("value", -0.18)
-		  .on("change", changefunc)
+		.attr("style", "display:none;")
+		.attr("type", "file")
+		.attr("id", "loadconfig")
+		.text("Load")
+		.on("change", function() {
+			loadConfig();
+			$(this).val("");
+		})
+	accControls
+		.append("button")
+		.text("Load")
+		.classed("ui-button", true)
+		.on("click", function() {$("#loadconfig").click()})
+	accControls.append("p")
+
+}
+
+function genPanelControls(panelid, fields, changefunc) {
+			var ctrl = d3.select("#" + panelid)
+			$.each(fields, function(key, field) {
+				ctrl.append("li")
+				  .text(field.label + ": ")
+				  //.style("font-weight", "normal")
+				.append("input")
+				  .attr("id", key + "-" + panelid)
+				  .attr("save", true)
+				  .attr("type", "text")
+				  .attr("name", key)
+				  .attr("value", field.defaultValue)
+				  .on("change", changefunc)
+			})
+			
+}
+
+function makeNewPanel(panelid, paneltype) {
+	
+	changefunc = update_plots;
+	
+	nextnum = panelid.split('-').slice(-1)[0]
+	
+	for (var key in elements) {
+		if (elements[key].label==paneltype) {
+			newtype = key;
+			break;
+		}
+	}
+	
+	var panelContent = "<h3>" + paneltype + "</h3><div paneltype=" + newtype + " id=" + panelid + "></div>";
+	$('#accordion').append(panelContent)
+
+	elements[newtype].createPanelControls(panelid, changefunc);
+	
+	newControls = d3.select("#" + panelid)
+		.append('div')
+		.append("button")
+			.text("Delete")
+			.classed("ui-button ui-widget", true)		
+			.attr("id", "removeelement")
+			.on("click", function () {
+
+				var parent = $(this).parentsUntil("#accordion").last();
+				parent.prev().remove();
+				parent.remove();
+				changefunc();
+				
+				})
+	$("#accordion").accordion('destroy').accordion({collapsible: true, active: -1});
+	changefunc();
+}
+
+function makeEntropyControls(target_id) {
+
+	  changefunc = update_plots;
+
+      var profControls = d3.select("#" + target_id).append('div')
+          .classed("profcontrols", true)
+      
+	  /*profControls.append("button")
+        .text("Calculate")
+        .classed("ui-button ui-corner-all ui-widget", true)		
+        .on("click", update_plots)*/
       
       var modeControls = d3.select("#" + target_id).append('div')
          .classed("modecontrols", true)
@@ -477,6 +647,7 @@ function makeProfileControls(target_id, initseq) {
       modeControls
 		.append("input")
 		.attr("id", "tethercheck")
+		.attr("save", true)
 		.attr("type", "checkbox")
 		.property("checked", false)
 		.on("change", function () {
@@ -500,67 +671,40 @@ function makeProfileControls(target_id, initseq) {
 			$("#Yplotquantity").val(newval)
 			changefunc();
 		})
-		
 	  modeControls
-		.append("label")
+	   .append("label")
 		.text("Polypeptide tethered? ")
+	  modeControls
 		.append("label")
 		  .text("Tether length (nm): ")
 		  .attr("name", "tethergroup0")
 		.append("input")
 		  .attr("id", "Ltether")
+		  .attr("save", true)
 		  .attr("type", "text")
 		  .attr("name", "tethergroup1")
 		  .attr("value", 2.0)
 		  .property("disabled", true)
 		  .on("change", changefunc)
 
-	  
-	  var barrierControls = d3.select("#" + target_id).append('div')
-	    .classed("barriercontrols", true)
-      barrierControls
-		.append("label")
-          .text("Barrier parameters: ")
-		  .style("font-weight", "bold")
-		.append("label")
-		  .text("Barrier height (kT): ")
-		  .style("font-weight", "normal")
-        .append("input")
-		  .attr("id", "Eb")
-          .attr("type", "text")
-          .attr("name", "Eb")
-          .attr("value", 16.)
-		  .on("change", changefunc)
-	  barrierControls
-		.append("label")
-		  .text(" Barrier width (nm): ")
-		.append("input")
-		  .attr("id", "wb")
-          .attr("type", "text")
-          .attr("name", "wb")
-          .attr("value", 3.5)
-		  .on("change", changefunc)
-	  barrierControls
-		.append("label")
-		  .text(" Barrier position (nm): ")
-		.append("input")
-		  .attr("id", "xb")
-          .attr("type", "text")
-          .attr("name", "xb")
-          .attr("value", 12.)
-		  .on("change", changefunc)
-		  
+}
+
+function makeVoltageControls(target_id) {
+
+	changefunc = update_plots;
+
 	var voltageControls = d3.select("#" + target_id).append('div')
 	    .classed("voltagecontrols", true)
-      voltageControls
+     voltageControls
 		.append("label")
           .text("Voltage range (mV): ")
-		  .style("font-weight", "bold")
+		  //.style("font-weight", "bold")
 		.append("label")
 		  .text("min: ")
 		  .style("font-weight", "normal")
         .append("input")
 		  .attr("id", "minV")
+		  .attr("save", true)
           .attr("type", "text")
           .attr("name", "minV")
           .attr("value", 10.)
@@ -570,6 +714,7 @@ function makeProfileControls(target_id, initseq) {
 		  .text(" max: ")
 		.append("input")
 		  .attr("id", "maxV")
+		  .attr("save", true)
           .attr("type", "text")
           .attr("name", "maxV")
           .attr("value", 60.)
@@ -579,6 +724,7 @@ function makeProfileControls(target_id, initseq) {
 		  .text(" step: ")
 		.append("input")
 		  .attr("id", "stepV")
+		  .attr("save", true)
           .attr("type", "text")
           .attr("name", "stepV")
           .attr("value", 2.5)
@@ -588,52 +734,27 @@ function makeProfileControls(target_id, initseq) {
 	    .classed("mincontrols", true)
       minControls
 		.append("label")
-          .text("Search for potential minimum between ")
+          .text("Injection point (nm): at potential minimum between ")
         .append("input")
 		  .attr("id", "x0min")
+		  .attr("save", true)
           .attr("type", "text")
           .attr("name", "x0min")
           .attr("value", 5.)
 		  .on("change", changefunc)
 	  minControls.append("label")
-          .text(" nm and ")		  
+          .text(" and ")		  
 		.append("input")
 		  .attr("id", "x0max")
+		  .attr("save", true)
           .attr("type", "text")
           .attr("name", "x0max")
           .attr("value", 20.)
 		  .on("change", changefunc)
-	   minControls.append("label")
-          .text(" nm")		  
-	  
-	  
+		  
+}
 
-		//$("#sequence").width($("#" + target_id).width());
-//          .on("change", update_plots)
-		
-     /* 
-      var fitControls = d3.select("#" + target_id).append('div')
-        .classed("fit controls", true)
-        .style("padding-top", "5px")
-        
-      fitControls.append("button")
-        .text("start fit")
-
-        .on("click", fit)
-        
-      fitControls.append("label")
-        .text(" log:")
-      
-      fitControls.append("div")
-        .append("pre")
-        .classed("fit log", true)
-
-      update_mode.call({value: "edit"});
-      */
-      //$(profControls.node()).controlgroup();
-    }
-	
-function makeVplotControls(target_id_topleft, target_id_topright, target_id_left, target_id_right, labels) {
+function makeVplotControls(target_id_topleft, target_id_topcenter, target_id_topright, target_id_left, target_id_right, labels) {
 	
 	var changefunc = update_Vplot
 	
@@ -676,29 +797,44 @@ function makeVplotControls(target_id_topleft, target_id_topright, target_id_left
 		$("#Yplotquantity").val(labels["tesc"]);
 		$("#Yplotscale").val("log");
 		
-	var fileControls = d3.select("#" + target_id_topleft).append('div')
-			.classed("fileControls", true)
+	var fileControls = d3.select("#" + target_id_topleft)
 		
 		fileControls
 		.append("label")
 			.text("Load data file: ")
 		.append("input")
-//			.classed("ui-button ui-widget", true)
+//			.classed("ui-button", true)
 			.attr("type", "file")
 			.on("change", loadData)
 			.attr("id","datafile")
 			
-	var fileControls2 = d3.select("#" + target_id_topright).append('div')
-			.classed("fileControls", true)
+	var fileControls2 = d3.select("#" + target_id_topright)
 			
 		fileControls2
 		.append("button")
-//			.classed("ui-button ui-widget", true)
+			//.classed("ui-button", true)
 			.text("Clear data")
 			.attr("id", "btnClearData")
 			.on("click", function () {
 				$("#datafile").val("");
 				loadData();
+				})
+	
+	var fileControls3 = d3.select("#" + target_id_topcenter)
+			
+		fileControls3
+		.append("button")
+			//.classed("ui-button", true)
+			.text("Reverse polarity")
+			.attr("id", "btnReverseV")
+			.property("disabled", true)
+			.on("click", function () {
+				for (var i = 0; i < expdata.length; i++) {
+					expdata[i][0] = -expdata[i][0];
+					expdata[i][2]["xlower"] = -expdata[i][2]["xlower"];
+					expdata[i][2]["xupper"] = -expdata[i][2]["xupper"];
+					update_Vplot()
+				}
 				})
 				
 	var exportControls = d3.select("#" + target_id_right).append('div')
@@ -707,6 +843,7 @@ function makeVplotControls(target_id_topleft, target_id_topright, target_id_left
 		exportControls
 		.append("button")
 			.text("Export calculation")
+			.classed("ui-button", true)
 			.attr("id", "btnExportCalc")
 			.on("click", function () {
 					//format data to saveData
@@ -730,6 +867,8 @@ function loadData() {
 			for (var i = 0; i<r.length; i++) {
 				expdata.push([r[i][0], r[i][1], {"xlower": r[i][0], "xupper": r[i][0], "ylower": r[i][1]-r[i][2], "yupper": r[i][1] + r[i][2]}])
 			}
+			
+			$("#btnReverseV").prop("disabled", false)
 			//console.log(expdata);
 			//Format for plotting
 			update_Vplot();
@@ -737,6 +876,7 @@ function loadData() {
 		reader.readAsText(file);
 	} else {
 		expdata = [];
+		$("#btnReverseV").prop("disabled", true)
 		update_Vplot();
 	}
 }
@@ -756,6 +896,99 @@ function saveData(data, fileName, type) {
 	   .attr("download", fileName)
 	   .node().click();
 	  setTimeout(function() { window.URL.revokeObjectURL(url) }, 1000);
+	}
+}
+
+function saveConfig() {
+	// saves current configuration as a JSON file that can be reloaded later
+	
+	var panels = new Object();
+	var data = new Object();
+	
+	$('[id^=panel-]').each(function() {
+		/*panels[$(this).attr('id')] = {paneltype: $(this).attr('paneltype'),
+									  data: $(this).find("[save=true]").each(function() {
+										  subdata = Object()
+										  switch ($(this).attr('type')) {
+											  case 'text':
+												 subdata[$(this).attr('id')] = $(this).val();
+												 break;
+											  case 'radio':
+											  case 'checkbox':
+												 subdata[$(this).attr('id')] = $(this).property('checked');
+												 break;
+											  default:
+											}
+											})
+									  }*/
+		panels[$(this).attr('id')] = $(this).attr('paneltype');
+	})
+
+	$("[save=true]").each(function() {
+		  switch ($(this).attr('type')) {
+			  case 'text':
+				 data[$(this).attr('id')] = $(this).val();
+				 break;
+			  case 'radio':
+			  case 'checkbox':
+				 data[$(this).attr('id')] = $(this).prop('checked');
+				 break;
+			  default:
+			}
+			})
+	
+	//return JSON.stringify({panels: panels, data: data});
+	output = JSON.stringify({panels: panels, data: data})
+	
+	saveData(output, "config.json", "application/json");
+}
+
+function loadConfig() {
+	
+	var file = $("#loadconfig")[0].files[0]; // only one file allowed
+	if (file) {
+		datafilename = file.name;
+		var result = null;
+		var reader = new FileReader();
+		reader.onload = function(e) {
+		
+			// first parse JSON back into config, then call this function
+			config = JSON.parse(e.target.result);
+
+			// clear accordion of custom panels
+			$("[id^=panel-]").each(function () {
+				$(this).prev().remove();
+				$(this).remove();
+			})
+			$("#accordion").accordion('destroy').accordion({collapsible: true, active: false});
+			
+			// repopulate accordion with saved values
+			for (var key in config["panels"]) {
+				var paneltype = elements[config["panels"][key]].label
+				var data = Object()
+				/*for (var datakey in defaultPanelValues[paneltype]) {
+					data[datakey] = config["data"][datakey + "-" + key]
+					delete config["data"][datakey + "-" + key]
+				}*/
+				makeNewPanel(key, paneltype)
+			}
+			
+			// fill in all the fields
+			for (var key in config["data"]) {
+				switch ($("#" + key).attr('type')) {
+					case "text":
+						$("#" + key).val(config["data"][key])
+						break;
+					case "radio":
+					case "checkbox":
+						$("#" + key).prop("checked", config["data"][key])
+						break;
+					default:
+				}
+			}
+			update_plots()
+		}
+		reader.readAsText(file);
 	}
 }
 

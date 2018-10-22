@@ -3,7 +3,12 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="author" content="David P. Hoogerheide">
 		<title>Polypeptide escape time calculator</title>
-
+		<link rel="stylesheet" type="text/css" href="./css/layout-default-latest.css" />
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans" />
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Special+Elite" />
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Love+Ya+Like+A+Sister" />
+		<link href="https://code.jquery.com/ui/1.12.1/themes/ui-lightness/jquery-ui.css"
+				type="text/css" rel="stylesheet" />
 		<style>
 
 		html, body {
@@ -44,7 +49,7 @@
 		}
 
 		.axis-label {
-		  font-size: 18px;
+		  font-size: 16px;
 		}
 
 		.axis .tick text {
@@ -128,6 +133,18 @@
 			stroke: orange;
 			stroke-dasharray: 10,2;
 		}
+		
+		.ui-widget {
+			font-size: 1.0em
+		}
+		
+		.ui-accordion .ui-accordion-header {
+			padding: .3em .3em .3em .5em;
+		}
+		
+		.ui-state-default {
+			// background: #80ced6
+		}
 
 		rect {
 		  fill: none;
@@ -141,15 +158,8 @@
 		  fill-opacity: 0.5;
 		}
 	</style>
-		<link rel="stylesheet" type="text/css" href="./css/layout-default-latest.css" />
-		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans" />
-		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Special+Elite" />
-		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Love+Ya+Like+A+Sister" />
-		<link href="https://code.jquery.com/ui/1.10.4/themes/start/jquery-ui.css"
-				type="text/css" rel="Stylesheet" />
-
 		<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script> 
-		<script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>						
+		<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>						
 		<script type="text/javascript" src="js/jquery.layout-latest.js"></script>
 		<script src="js/jquery-extend.js"></script>
 		<script src="js/math.js" type="text/javascript"></script>		
@@ -171,13 +181,102 @@
 
 		tlabelmap = {tesc: labelmap["tesc"],
 					x0: labelmap["x0"]}
-					
+/*					
+		elementmap = {erf: "Barrier",
+					  gauss: "Gaussian"}
+					  
+		defaultPanelValues = {Barrier: {Eb: 16.0, wb: 3.5, xb: 12},
+							  Gaussian: {Gheight: 4.0, Gwidth: 3.5, Gx: 5.0}}
+*/
+		//type field cannot have spaces!				  
+		Barrier = {label: "Barrier",
+					type: "Barrier",
+					fields: {Eb: {label: "Height (kT)",
+								 defaultValue: 16},
+							wb: {label: "Width (sigma) (nm)",
+								 defaultValue: 3.5},
+							xb: {label: "Position (nm)",
+								 defaultValue: 12},
+							},
+				   U: function (panelid, x, dx) {
+						var Eb = Number($("#Eb-" + panelid).val())
+						var xb = Number($("#xb-" + panelid).val())
+						var wb = Number($("#wb-" + panelid).val())
+						return math.multiply(Eb, erf(x, xb, wb, dx))
+				   },
+				   createPanelControls: function(panelid, changefunc) {
+						genPanelControls(panelid, this.fields, changefunc)
+				   }
+		}
+
+		Gaussian = {label: "Gaussian",
+					type: "Gaussian",
+					fields: {Gheight: {label: "Height (kT)",
+								 defaultValue: 4},
+							Gwidth: {label: "Width (sigma) (nm)",
+								 defaultValue: 3.5},
+							Gx: {label: "Position (nm)",
+								 defaultValue: 5},
+							},
+					U: function (panelid, x, dx) {
+						var Gheight = Number($("#Gheight-" + panelid).val())
+						var Gx = Number($("#Gx-" + panelid).val())
+						var Gwidth = Number($("#Gwidth-" + panelid).val())
+						//unnormalized Gaussian
+						return math.multiply(Gheight, gaussian_unnorm(x, Gx, Gwidth))
+				   },
+				   createPanelControls: function(panelid, changefunc) {
+						genPanelControls(panelid, this.fields, changefunc)
+				   }
+		}
+		
+		ConstantF = {label: "Constant force",
+					 type: "ConstantF",
+					fields: {fu: {label: "Constant offset force (pN)",
+								   defaultValue: 0},
+							  xleft: {label: "Starting position (nm)",
+								   defaultValue: 0},
+							  xright: {label: "Ending position (nm)",
+							       defaultValue: Infinity}
+							  },
+					U: function (panelid, x, dx) {
+						var fu = Number($("#fu-" + panelid).val())
+						var xleft = Number($("#xleft-" + panelid).val())
+						var xright = Number($("#xright-" + panelid).val())
+						y = math.map(x, function(v) {
+							return ((v >= xleft) && (v <= xright)) ? 1 : 0
+							})
+						return cumsum(math.multiply(1*fu, y), dx)
+					},
+					createPanelControls: function(panelid, changefunc) {
+						genPanelControls(panelid, this.fields, changefunc)
+				   }
+		}
+		
+		elements = {"Barrier": Barrier,
+					"Gaussian": Gaussian,
+					"ConstantF": ConstantF}
+		
 		window.onload = function() { 
 	
-			makeProfileControls("bottom_panel", asynseq);
-			makeVplotControls("plot1_controls_topleft", "plot1_controls_topright", "plot1_controls_left", "plot1_controls_right", labelmap);
+			var panelContent = "<h4>General parameters</h4><div id=general></div><h4>Pore parameters</h4><div id=pore></div><h4>Sequence</h4><div id=sequencepanel></div><h4>Entropy</h4><div id=entropy></div>";
+			$('#accordion').append(panelContent).accordion({collapsible: true, active: false})
+
+			makeGeneralAccordionControls("accordion-head");
+			makeGeneralProfileControls("general");
+			makeVoltageControls("general")
+			//makeProfileControls("general");
+			makePoreControls("pore");
+			makeEntropyControls("entropy");
+			makeSequenceControls("sequencepanel", asynseq);
+			//makeGeneralAccordionControls("accordion-head", asynseq)
+			makeVplotControls("plot1_controls_topleft", "plot1_controls_topleft", "plot1_controls_topright", "plot1_controls_left", "plot1_controls_right", labelmap);
 			makeChargeDensityControls("plot3_controls_bottomright")
 			makePotentialControls("plot2_controls_bottomright")
+			//$("#accordion").accordion("option", "active", 0);
+			makeNewPanel("panel-0", "Barrier")
+			//$("#accordion").accordion("option", "active", "false");
+			$("#accordion").accordion("option", "active", 0);
 	
 			layout = $('body').layout({
 					east__size:			$('body').width()/2
@@ -216,11 +315,11 @@
 			var maxV = Number($("#maxV").val());
 			var stepV = Number($("#stepV").val());
 			var Vs = math.range(minV, maxV, stepV, true).toArray();
-			var fu = Number($("#fu").val());
+			//var fu = Number($("#fu").val());
 			var D = 1e6*Number($("#D").val());
-			var Eb = Number($("#Eb").val());
-			var xb = Number($("#xb").val());
-			var wb = Number($("#wb").val());
+			//var Eb = Number($("#Eb").val());
+			//var xb = Number($("#xb").val());
+			//var wb = Number($("#wb").val());
 			var Lp = Number($("#Lp").val()); //nm
 			var x0min = Number($("#x0min").val()); //nm
 			var x0max = Number($("#x0max").val());
@@ -277,7 +376,7 @@
 				V = Vs[i];
 				if (tethered) {
 					x = xorg;
-					br = barrier1(V, x, chargedensitycorr, laa, Lp, Ltether, Eb, xb, wb, fu);
+					br = barrier1(V, x, chargedensitycorr, laa, Lp, Ltether);
 					x = br[0]
 					U = br[1]
 					x0 = (x0min==x0max) ? x0min : minInRange(x, U, x0min, x0max);
@@ -286,7 +385,7 @@
 					dataV.x0.push([V, x0])
 				} else {
 				
-					U = barrier(V, x, chargedensitycorr, laa, Eb, xb, wb, fu);
+					U = barrier(V, x, chargedensitycorr, laa);
 					x0 = (x0min==x0max) ? x0min : minInRange(x, U, x0min, x0max);
 					var esct = calcEscapeTime2x(x, x0, U, D, dx)
 					dataV.tesc.push([V, esct[4]])
@@ -413,11 +512,12 @@
 				<h3>Polypeptide escape time calculator</h3>
 			</div>
 			<div style="margin-left: 220px; float:right">
-				<span style="display:inline-block; vertical-align:middle"><br>David P. Hoogerheide<br>Last updated May 29, 2018 </span>
+				<span style="display:inline-block; vertical-align:middle"><br>David P. Hoogerheide<br>Last updated October 22, 2018 </span>
 			</div>
 		</div>
 		<div id="centerplot" class="ui-layout-east">
 			<div id="plot1_controls_topleft" style="float: left"></div>
+			<div id="plot1_controls_topcenter" style="float: center"></div>
 			<div id="plot1_controls_topright" style="float: right"></div>
 			<div id="plot1" style="float: left"></div>
 			<div id="plot1_controls_left" style="float: left"></div>
@@ -434,6 +534,12 @@
 				<div id="plot2_controls_bottomright" style="float: right; position: absolute"></div>
 			</div>
 		</div>
-		<div id="bottom_panel" class="ui-layout-south"></div>
+		<div id="bottom_panel" class="ui-layout-south">
+			<div id="accordion-head">
+				<div id="accordion-head_topleft" style="float: left"></div>
+				<div id="accordion-head_topright" style="float: right"></div>
+			</div>
+			<div id="accordion" style="clear: both"></div>
+		</div>
 	</body>
 </html>
