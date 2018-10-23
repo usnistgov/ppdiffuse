@@ -232,7 +232,7 @@
 		
 		ConstantF = {label: "Constant force",
 					 type: "ConstantF",
-					fields: {fu: {label: "Constant offset force (pN)",
+					fields: {fu: {label: "Constant offset force (pN = 0.242 kT/nm)",
 								   defaultValue: 0},
 							  xleft: {label: "Starting position (nm)",
 								   defaultValue: 0},
@@ -246,7 +246,7 @@
 						y = math.map(x, function(v) {
 							return ((v >= xleft) && (v <= xright)) ? 1 : 0
 							})
-						return cumsum(math.multiply(1*fu, y), dx)
+						return cumsum(math.multiply(fu/kT, y), dx)
 					},
 					createPanelControls: function(panelid, changefunc) {
 						genPanelControls(panelid, this.fields, changefunc)
@@ -440,7 +440,7 @@
 			if (plots && plots.chart) {
 				if (plots.chart.replot) plots.chart.replot();
 				if (plots.chart.plugins && plots.chart.plugins.cursor.resetZoom) plots.chart.plugins.cursor.resetZoom();
-				$('#plot1').height($("#centerplot").height()-40);
+				$('#plot1').height($("#centerplot").height()-60);
 				if (plots.chart.autofit) plots.chart.autofit();
 			}
 			if (plots && plots.chart2) {
@@ -512,7 +512,7 @@
 				<h3>Polypeptide escape time calculator</h3>
 			</div>
 			<div style="margin-left: 220px; float:right">
-				<span style="display:inline-block; vertical-align:middle"><br>David P. Hoogerheide<br>Last updated October 22, 2018 </span>
+				<span style="display:inline-block; vertical-align:middle"><br>David P. Hoogerheide<br>Last updated October 23, 2018 </span>
 			</div>
 		</div>
 		<div id="centerplot" class="ui-layout-east">
