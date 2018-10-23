@@ -316,7 +316,9 @@
 			//var Eb = Number($("#Eb").val());
 			//var xb = Number($("#xb").val());
 			//var wb = Number($("#wb").val());
+			var laa = Number($("#laa").val()); //nm
 			var Lp = Number($("#Lp").val()); //nm
+			var b = Number($("#b_kuhn").val()); //nm
 			var x0min = Number($("#x0min").val()); //nm
 			var x0max = Number($("#x0max").val());
 			var N2C = ($("#seqdirN2C").prop("checked"))
@@ -372,7 +374,7 @@
 				V = Vs[i];
 				if (tethered) {
 					x = xorg;
-					br = barrier1(V, x, chargedensitycorr, laa, Lp, Ltether);
+					br = barrier1(V, x, chargedensitycorr, laa, b, Lp, Ltether);
 					x = br[0]
 					U = br[1]
 					x0 = (x0min==x0max) ? x0min : minInRange(x, U, x0min, x0max);

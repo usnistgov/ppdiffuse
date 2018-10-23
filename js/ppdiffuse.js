@@ -10,8 +10,8 @@ var asynseqN2C = 'MDVFMKGLSK AKEGVVAAAE KTKQGVAEAA GKTKEGVLYV GSKTKEGVVH GVATVAE
 var asynseq = asynseqN2C.split('').reverse().join('');
 var kT = 1.38e-23*300*1e12*1e9; // units are pN nm
 var e = 1.6e-19*1e12*1e9*1e-3; // sets voltage units in mV
-var laa = 0.4; // length per amino acid in nm
-var b = 0.6; // Kuhn length in nm
+//var laa = 0.4; // length per amino acid in nm; now an input
+var b = 0.6; // Kuhn length in nm; now an input
 
 function cumsum(array, dx) {
 	//cumulative sum of an array. Like an integral.
@@ -61,7 +61,7 @@ function US(x, laa) {
 	
 }
 
-function US1(x, Lp, Ltether) {
+function US1(x, Lp, Ltether, b) {
 
 	var dx = (x[x.length-1] - x[0])/(x.length-1);
 	var delta = 1e-3;
@@ -192,7 +192,7 @@ function barrier(V, x, chargedensity, laa) {
 	return U
 }
 
-function barrier1(V, x, chargedensity, laa, Lp, Ltether) {
+function barrier1(V, x, chargedensity, laa, b, Lp, Ltether) {
 
 	//var protseq = seq2charge(seq, N2C);
 	//var x = math.multiply(math.range(0, protseq.length).toArray(), laa);
@@ -200,7 +200,7 @@ function barrier1(V, x, chargedensity, laa, Lp, Ltether) {
 	Ue = math.multiply(cumsum(chargedensity, dx), e*V/kT, 1.);
 	//document.write(math.min(Ue), '<br>')	
 	//U = math.add(Ue, math.multiply(1., US(x, laa)), math.multiply(1*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x))
-	entropy = US1(x, Lp, Ltether)
+	entropy = US1(x, Lp, Ltether, b)
 	//U = math.add(Ue, math.multiply(1., entropy[0]), math.multiply(1*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x))
 	U = math.add(Ue, math.multiply(1., entropy[0]), get_barrier_components(x, dx))
 	x = math.filter(x, function (v, i) {return entropy[1][i]})
@@ -454,7 +454,17 @@ function makeSequenceControls(target_id, initseq) {
 	  seqControls
         .append("label")
 		  .attr("id", "seqlabel")
-          .text("Sequence: ")
+		  .text("Sequence: ")
+		.append("button")
+			.text("reverse")
+			.classed("ui-button ui-widget", true)		
+			.attr("id", "reversebutton")
+			.on("click", function () {
+				$("#sequence").val($("#sequence").val().split('').reverse().join(''));
+				($("#seqdirN2C").prop("checked")) ? $("#seqdirC2N").prop("checked", true) : $("#seqdirN2C").prop("checked", true)
+				changefunc();
+				})
+	  seqControls.append("br")
 	  seqControls
         .append("textarea")
 		  .attr("id", "sequence")
@@ -466,20 +476,8 @@ function makeSequenceControls(target_id, initseq) {
 		  .on("change", changefunc)
 		  $("#sequence").val(initseq)
 
-	   seqControls.append("p")
-
-	   seqControls.append("button")
-        .text("reverse")
-        .classed("ui-button ui-widget", true)		
-		.attr("id", "reversebutton")
-        .on("click", function () {
-			$("#sequence").val($("#sequence").val().split('').reverse().join(''));
-			($("#seqdirN2C").prop("checked")) ? $("#seqdirC2N").prop("checked", true) : $("#seqdirN2C").prop("checked", true)
-			changefunc();
-			})
-			
-
-	   seqControls
+		seqControls.append("br")
+		seqControls
         .append("label")
 		.attr("id", "seqlabel2")
         .text(" Direction:")
@@ -507,6 +505,27 @@ function makeSequenceControls(target_id, initseq) {
 		 .append("label")
 		 .attr("id", "seqlabel4")
 		 .text("C->N") 
+		 seqControls2 = seqControls.append("div")
+		 seqControls2
+		  .append("label")
+		  .text("Length per amino acid (nm): ")
+	      .append("input")
+			.attr("id", "laa")
+			.attr("save", true)
+			.attr("type", "text")
+			.attr("name", "laa")
+			.attr("value", 0.4)
+			.on("change", changefunc)
+		  seqControls2
+		  .append("label")
+		  .text(" Kuhn length (nm): ")
+	      .append("input")
+			.attr("id", "b_kuhn")
+			.attr("save", true)
+			.attr("type", "text")
+			.attr("name", "b_kuhn")
+			.attr("value", 0.6)
+			.on("change", changefunc)
 }
 
 function makeGeneralAccordionControls(target_id) {
