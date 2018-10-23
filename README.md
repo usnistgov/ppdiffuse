@@ -102,3 +102,7 @@ A gaussian element adds a gaussian function of the specified height and width (s
 ##### Constant force element
 
 A constant force element adds a constant slope to the quasipotential. The beginning and ending positions of the slope are specified by the controls, as is the magnitude of the force in pN. The converstion is 4.11 pN = 1  kT/nm at room temperature.
+
+### Acknowledgement
+
+Creation of this calculator would not have been possible without support from [Brian Maranville](https://bmaranville.github.io/), particularly his excellent [implementation of D3](https://bmaranville.github.io/d3-science-v4/) for scientific plotting.
