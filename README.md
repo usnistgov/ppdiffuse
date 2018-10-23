@@ -1,7 +1,8 @@
 # Polypeptide diffusion calculator (ppdiffuse)
 ## *Web-based calculator for voltage-driven transport of polypeptides through nanopores*
 
-## [Load calculator](./ppdiffuse.html)
+<div><h2><a href="./ppdiffuse.html" style="background-color: violet; border: 20px solid violet">Load calculator</a></h2></div>
+
 ---
 ### References
 + Hoogerheide et al., *Biophysical Journal* 2018. "Real-Time Nanopore-Based Recognition of Protein Translocation Success." [doi:10.1016/j.bpj.2017.12.019](https://doi.org/10.1016/j.bpj.2017.12.019)
