@@ -142,10 +142,6 @@
 			padding: .3em .3em .3em .5em;
 		}
 		
-		.ui-state-default {
-			// background: #80ced6
-		}
-
 		rect {
 		  fill: none;
 		  user-select: none; 
@@ -259,7 +255,7 @@
 		
 		window.onload = function() { 
 	
-			var panelContent = "<h4>General parameters</h4><div id=general></div><h4>Pore parameters</h4><div id=pore></div><h4>Sequence</h4><div id=sequencepanel></div><h4>Entropy</h4><div id=entropy></div>";
+			var panelContent = "<h4>General parameters</h4><div id=general></div><h4>Sequence</h4><div id=sequencepanel></div><h4>Pore parameters</h4><div id=pore></div><h4>Entropy</h4><div id=entropy></div>";
 			$('#accordion').append(panelContent).accordion({collapsible: true, active: false})
 
 			makeGeneralAccordionControls("accordion-head");
