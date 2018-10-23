@@ -1,8 +1,8 @@
 # Polypeptide diffusion calculator (ppdiffuse)
-## Web-based calculator for voltage-driven transport of polypeptides through nanopores
+## *Web-based calculator for voltage-driven transport of polypeptides through nanopores*
 
-## [Run calculator](./ppdiffuse.html)
-
+## [Load calculator](./ppdiffuse.html)
+---
 ### References
 + Hoogerheide et al., *Biophysical Journal* 2018. "Real-Time Nanopore-Based Recognition of Protein Translocation Success." [doi:10.1016/j.bpj.2017.12.019](https://doi.org/10.1016/j.bpj.2017.12.019)
 + Hoogerheide et al., *Nanoscale* 2017. "Mechanism of α-synuclein translocation through a VDAC nanopore revealed by energy landscape modeling of escape time distributions." [doi:10.1039/C6NR08145B](https://doi.org/10.1039/C6NR08145B)
