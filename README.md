@@ -66,7 +66,7 @@ The calculation and quasipotential controls are divided into panels. The descrip
 #### Sequence
 
 ![sequence](./docs/sequence.jpg)
-+ The polypeptide sequence determines both the length of the diffusion region (0.4 nm per amino acid) and the charge density profile in the [charge density graphic](#A-Charge-density-graphic). Spaces are ignored. Lysine (K), arginine (R), and histidine (H) residues are assigned +1 charges, while aspartic (D) and glutamic (E) acid residues are assigned -1. An Alexa 488 tag (X) is assigned a -2 charge.
++ The polypeptide sequence determines both the length of the diffusion region (0.4 nm per amino acid) and the charge density profile in the [charge density graphic](#a-Charge-density-graphic). Spaces are ignored. Lysine (K), arginine (R), and histidine (H) residues are assigned +1 charges, while aspartic (D) and glutamic (E) acid residues are assigned -1. An Alexa 488 tag (X) is assigned a -2 charge.
 + The polypeptide always translocates from left to right, so the "direction" control sets the order of the amino acids.
 + The reverse button reverses the amino acid order.
 
