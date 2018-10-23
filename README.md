@@ -4,9 +4,12 @@
 ## [Run calculator](./ppdiffuse.html)
 
 ### References
-+ Hoogerheide et al., *Biophysical Journal* 2018. "Real-Time Nanopore-Based Recognition of Protein Translocation Success", [doi:10.1016/j.bpj.2017.12.019](https://doi.org/10.1016/j.bpj.2017.12.019)
-+ Hoogerheide et al., *Nanoscale* 2017. "Mechanism of α-synuclein translocation through a VDAC nanopore revealed by energy landscape modeling of escape time distributions", [doi:10.1039/C6NR08145B](https://doi.org/10.1039/C6NR08145B)
-+ Hoogerheide et al., *Phys. Rev. Lett.* 2013. [doi:10.1103/PhysRevLett.111.248301](https://doi.org/10.1103/PhysRevLett.111.248301)
++ Hoogerheide et al., *Biophysical Journal* 2018. "Real-Time Nanopore-Based Recognition of Protein Translocation Success." [doi:10.1016/j.bpj.2017.12.019](https://doi.org/10.1016/j.bpj.2017.12.019)
++ Hoogerheide et al., *Nanoscale* 2017. "Mechanism of α-synuclein translocation through a VDAC nanopore revealed by energy landscape modeling of escape time distributions." [doi:10.1039/C6NR08145B](https://doi.org/10.1039/C6NR08145B)
++ Hoogerheide et al., *Phys. Rev. Lett.* 2013. "Escape of DNA from a Weakly Biased Thin Nanopore: Experimental Evidence for a Universal Diffusive Behavior." [doi:10.1103/PhysRevLett.111.248301](https://doi.org/10.1103/PhysRevLett.111.248301)
++ B. Lu et al., *Phys. Rev. E* 2012. "Effective driving force applied on DNA inside a solid-state nanopore." [doi:10.1103/PhysRevE.86.011921](https://doi.org/10.1103/PhysRevE.86.011921)
++ S. van Dorp et al., *Nature Physics* 2009. "Origin of the electrophoretic force on DNA in solid-state nanopores." [doi:10.1038/nphys1230](https://doi.org/10.1038/nphys1230)
+
 
 ### Introduction
 
@@ -84,6 +87,8 @@ The entropy controls extend the calculator to treat tethered polyelectrolytes (*
 
 The "Add new: " button allows custom elements to be added to the quasipotential. These include barrier (error function), gaussian, and constant force elements. The fields are self-explanatory, so only "barrier" is shown here. 
 
+Each custom element can be removed from the calculation using the "delete" button.
+
 ##### Barrier element
 
 ![barrier](./docs/barrier.jpg)
@@ -95,3 +100,5 @@ A barrier element adds an error function of the given height (negative reduces t
 A gaussian element adds a gaussian function of the specified height and width (sigma) at the specified position. Note that this is an *unnormalized* Gaussian; the height of the Gaussian will be equal to the height of the barrier at its maximum point.
 
 ##### Constant force element
+
+A constant force element adds a constant slope to the quasipotential. The beginning and ending positions of the slope are specified by the controls, as is the magnitude of the force in pN. The converstion is 4.11 pN = 1  kT/nm at room temperature.
