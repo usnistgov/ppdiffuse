@@ -24,7 +24,7 @@ This calculator derives from the modeling work given in the references, in which
 + Membrane binding
 + Hydrodynamic drag (when a salt gradient is present)
 
-Other forces, such as localized barriers or binding potential wells, could also be present. The current calculator includes barriers (error function-shaped, Gaussian features, and constant forces, but can easily be extended to include any contribution to the diffusion potential.
+Other forces, such as localized barriers or binding potential wells, could also be present. The current calculator includes barriers (error functions), Gaussians, and constant forces, but can easily be extended to include any contribution to the diffusion potential.
 
 The escape times and probabilities are calculated by applying the Smoluchowski equation to the diffusion potential, assuming a constant diffusion constant.
 
@@ -66,7 +66,7 @@ The calculation and quasipotential controls are divided into panels. The descrip
 #### Sequence
 
 ![sequence](./docs/sequence.jpg)
-+ The polypeptide sequence determines both the length of the diffusion region (0.4 nm per amino acid) and the charge density profile in the [charge density graphic](#A.-Charge-density-graphic). Spaces are ignored. Lysine (K), arginine (R), and histidine (H) residues are assigned +1 charges, while aspartic (D) and glutamic (E) acid residues are assigned -1. An Alexa 488 tag (X) is assigned a -2 charge.
++ The polypeptide sequence determines both the length of the diffusion region (0.4 nm per amino acid) and the charge density profile in the [charge density graphic](#A-Charge-density-graphic). Spaces are ignored. Lysine (K), arginine (R), and histidine (H) residues are assigned +1 charges, while aspartic (D) and glutamic (E) acid residues are assigned -1. An Alexa 488 tag (X) is assigned a -2 charge.
 + The polypeptide always translocates from left to right, so the "direction" control sets the order of the amino acids.
 + The reverse button reverses the amino acid order.
 
