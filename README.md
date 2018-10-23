@@ -1,7 +1,7 @@
 # Polypeptide diffusion calculator (ppdiffuse)
 ## *Web-based calculator for voltage-driven transport of polypeptides through nanopores*
 
-<div><h2><a href="./ppdiffuse.html" style="background-color: violet; border: 20px solid violet">Load calculator</a></h2></div>
+<div><h2><a href="./ppdiffuse.html" style="background-color: violet; border: 20px solid violet; margin: 20px 20px 20px 20px">Load calculator</a></h2></div>
 
 ---
 ### References
