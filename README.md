@@ -67,8 +67,11 @@ The calculation and quasipotential controls are divided into panels. The descrip
 
 ![sequence](./docs/sequence.jpg)
 + The polypeptide sequence determines both the length of the diffusion region (0.4 nm per amino acid) and the charge density profile in the [charge density graphic](#a-charge-density-graphic). Spaces are ignored. Lysine (K), arginine (R), and histidine (H) residues are assigned +1 charges, while aspartic (D) and glutamic (E) acid residues are assigned -1. An Alexa 488 tag (X) is assigned a -2 charge.
-+ The polypeptide always translocates from left to right, so the "direction" control sets the order of the amino acids.
-+ The reverse button reverses the amino acid order.
++ The polypeptide always translocates from left to right, so the "reverse" button reverses the amino acid order.
++ The "direction" control determines which end of the molecule is the N (which carries an extra +1 charge) and which is the C (which carries an extra -1 charge) terminus.
++ The length per amino acid determines the position scale.
++ The Kuhn length is only used if the molecule is tethered (see [entropy](#entropy))
+
 
 #### Pore parameters
 ![pore_parameters](./docs/pore_parameters.jpg)
@@ -78,7 +81,7 @@ The calculation and quasipotential controls are divided into panels. The descrip
 #### Entropy
 ![entropy](./docs/entropy.jpg)
 The entropy controls extend the calculator to treat tethered polyelectrolytes (*i.e.* when translocation is known to be impossible).
-+ The entropy function is rather different in the tethered case, and turning on the tethering option applies the appropriate entropy function.
++ The entropy function is rather different in the tethered case, and turning on the tethering option applies the appropriate entropy function. Note that this function uses the "Kuhn length" parameter in the [sequence](#sequence) panel.
 + The tether length is a sensitive parameter that sets the maximum extension of the tethered polyelectrolyte.
 
 #### Custom quasipotential elements
