@@ -29,6 +29,8 @@ Other forces, such as localized barriers or binding potential wells, could also 
 
 The escape times and probabilities are calculated by applying the Smoluchowski equation to the diffusion potential, assuming a constant diffusion constant.
 
+# Instructions
+
 ### Calculator interface
 
 The default calculator view is shown here:
