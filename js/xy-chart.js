@@ -236,9 +236,9 @@
         //.on("dblclick.resetzoom", null)
         .on("dblclick.resetzoom", chart.resetzoom);
 
-        var axes = svg.append("g").attr("class", "axes").attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
+        var axes = svg.append("g").attr("class", "axes").attr("transform", "translate(" + (options.margin.left-30) + "," + options.margin.top + ")");
 
-        var mainview = svg.append("g").attr("class", "mainview").attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
+        var mainview = svg.append("g").attr("class", "mainview").attr("transform", "translate(" + (options.margin.left-30) + "," + options.margin.top + ")");
 
         function drag_started() {
           if (!zoomRect) return;
@@ -296,8 +296,8 @@
         chart.zoom = zoom;
 
         //.call(zoom);
-        axes.append("g").attr("class", "x axis").append("text").attr("class", "x axis-label").attr("x", width / 2.0).attr("text-anchor", "middle").attr("y", options.margin.bottom - 15);
-        axes.append("g").attr("class", "y axis").append("text").attr("class", "y axis-label").attr("text-anchor", "middle").attr("transform", "rotate(-90)").attr("y", -options.margin.left + 15).attr("x", -height / 2);
+        axes.append("g").attr("class", "x axis").append("text").attr("class", "x axis-label").attr("x", width / 2.0).attr("text-anchor", "middle").attr("y", options.margin.bottom - 35);
+        axes.append("g").attr("class", "y axis").append("text").attr("class", "y axis-label").attr("text-anchor", "middle").attr("transform", "rotate(-90)").attr("y", -options.margin.left + 50).attr("x", -height / 2);
 
         mainview.append("defs").append("clipPath").attr("id", "d3clip_" + id.toFixed()) // local def
         .append("rect")
@@ -804,7 +804,7 @@
       chart.svg.selectAll("g.x.axis text.axis-label").attr("x", width / 2.0);
       chart.svg.selectAll("g.y.axis text.axis-label").attr("x", -height / 2.0);
       chart.svg.select(".position-cursor").attr("x", width - 10).attr("y", height - 10);
-      chart.svg.select("g.legend").attr("transform", "translate(" + (width - 65) + ",25)");
+      chart.svg.select("g.legend").attr("transform", "translate(" + (width - options.legend.left) + ", " + (-options.legend.top) +")");
 
       update();
     };

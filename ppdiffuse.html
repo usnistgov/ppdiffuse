@@ -133,6 +133,10 @@
 			stroke: orange;
 			stroke-dasharray: 10,2;
 		}
+
+		.ui-layout-north {
+			padding: 1px
+		}
 		
 		.ui-widget {
 			font-size: 1.0em
@@ -277,13 +281,20 @@
 			layout = $('body').layout({
 					east__size:			$('body').width()/2
 				,	west__size:			100
+				,   north__minHeight:   63
+				,   north__resizable:   false
+				,   north__slidable:    false
+				,   north__closable:    false
+				,   center__size:       300
+				,	east__size:     	300
+				,   center__minHeight:  300
+				,   east__minHeight:    300
 				,   south__size:        "auto"
-				,   north__size:         "auto"
 					// RESIZE Accordion widget when panes resize
-				,	west__onresize:		$.layout.callbacks.resizePaneAccordions
-				,	east__onresize:		$.layout.callbacks.resizePaneAccordions
+				//,	north__onresize:    $.layout.callbacks.resizePaneAccordions					
+				//,	west__onresize:		$.layout.callbacks.resizePaneAccordions
+				//,	east__onresize:		$.layout.callbacks.resizePaneAccordions
 				,	south__onresize:    $.layout.callbacks.resizePaneAccordions
-				,	north__onresize:    $.layout.callbacks.resizePaneAccordions
 				,   center__onresize:   "fitPlots"
 			});
 			
@@ -292,14 +303,18 @@
 				,	west__size:			100
 				,   south__size:        $('#leftplot').height()*(3/5)
 				,   north__size:         "auto"
-				,	west__onresize:		$.layout.callbacks.resizePaneAccordions
-				,	east__onresize:		$.layout.callbacks.resizePaneAccordions
-				,	south__onresize:    $.layout.callbacks.resizePaneAccordions
-				,	north__onresize:    $.layout.callbacks.resizePaneAccordions
+				//,	west__onresize:		$.layout.callbacks.resizePaneAccordions
+				//,	east__onresize:		$.layout.callbacks.resizePaneAccordions
+				//,	south__onresize:    $.layout.callbacks.resizePaneAccordions
+				//,	north__onresize:    $.layout.callbacks.resizePaneAccordions
 				,   center__onresize:   "fitPlots"
 			});
 			
 			update_plots();
+			if (layout.state.north.isClosed) {
+				total_height = $('#leftplot').height() + $("#top_panel").height() + $("#bottom_panel").height()
+				layout.sizePane("south", total_height - $("#leftplot").height()-100)
+			}
 			fitPlots();
 
 		}
@@ -404,22 +419,36 @@
 			update_Vplot()
 			
 			$("#plot2").empty();
-			chart2 = xyChart.default({show_line: true, show_points: false, show_errorbars: false, ytransform: 'linear', legend: {show: true}})
+			chart2 = xyChart.default({show_line: true,
+									  show_points: false,
+									  show_errorbars: false,
+									  ytransform: 'linear',
+									  legend: {show: true, left:100, top:10}})
 			c2 = d3.select("#plot2")
 				.data([data])
 				.call(chart2);
 			plots["chart2"] = chart2;
 			chart2.zoomRect(true);
-			chart2.options({axes: {xaxis: {label: 'x (nm)'}, yaxis: {label: 'U (kT)'}}, series: Vlabels}).update()
+			chart2.options({axes: {xaxis: {label: 'x (nm)'}, yaxis: {label: 'U (kT)'}},
+							series: Vlabels,
+							margin: { top: 0, right: 80, bottom: 60, left: 0 },
+						}).update()
 			
 			$("#plot3").empty();
-			chart3 = xyChart.default({show_line: true, show_points: false, show_errorbars: false, ytransform: 'linear', legend: {show: true}})
+			chart3 = xyChart.default({show_line: true,
+									  show_points: false,
+									  show_errorbars: false,
+									  ytransform: 'linear',
+									  legend: {show: true, left:100, top:10}})
 			c3 = d3.select("#plot3")
 				.data([[data_cd, data_cd_corr]])
 				.call(chart3);
 			plots["chart3"] = chart3;
 			chart3.zoomRect(true);
-			chart3.options({axes: {xaxis: {label: 'x (nm)'}, yaxis: {label: 'Charge density (e/nm)'}}, series: [{label: 'native'}, {label: 'with EOF'}]}).update()
+			chart3.options({axes: {xaxis: {label: 'x (nm)'}, yaxis: {label: 'Charge density (e/nm)'}},
+							series: [{label: 'native'}, {label: 'with EOF'}],
+							margin: { top: 0, right: 80, bottom: 60, left: 0 }
+							}).update()
 			
 		}
 		//TODO:
@@ -438,7 +467,7 @@
 			if (plots && plots.chart) {
 				if (plots.chart.replot) plots.chart.replot();
 				if (plots.chart.plugins && plots.chart.plugins.cursor.resetZoom) plots.chart.plugins.cursor.resetZoom();
-				$('#plot1').height($("#centerplot").height()-60);
+				$('#plot1').height($("#centerplot").height()-50);
 				if (plots.chart.autofit) plots.chart.autofit();
 			}
 			if (plots && plots.chart2) {
@@ -465,11 +494,10 @@
 				})
 			}
 			var totalwidth = 0;
-			totalwidth += $("reversebutton").width()
-			$("label[id*=seqlabel").each(function () {totalwidth += $(this).width()})
-			$("label[id*=seqdir").each(function () {totalwidth += $(this).width()})
+			//totalwidth += $("reversebutton").width()
+			//$("label[id*=seqlabel").each(function () {totalwidth += $(this).width()})
+			//$("label[id*=seqdir").each(function () {totalwidth += $(this).width()}) 
 			$("#sequence").width($("#bottom_panel").width()-totalwidth-80);
-
 		}
 
 		function update_Vplot() {
@@ -492,13 +520,21 @@
 			}	
 				
 			$("#plot1").empty();
-			chart = xyChart.default({show_line: true, show_points: true, show_errorbars: true, ytransform: yscale, legend: {show: showlegend}})
+			chart = xyChart.default({show_line: true,
+									 show_points: true,
+									 show_errorbars: true,
+									 ytransform: yscale,
+									 legend: {show: showlegend}
+			})
 			c = d3.select("#plot1")
 				.data([showdata])
 				.call(chart);
 			plots["chart"] = chart;
 			chart.zoomRect(true);
-			chart.options({axes: {xaxis: {label: 'V (mV)'}, yaxis: {label: labeltext}}, series: labels}).update()
+			chart.options({axes: {xaxis: {label: 'V (mV)'}, yaxis: {label: labeltext}},
+						   series: labels,
+						   margin: { top: 0, right: 80, bottom: 60, left: 0 }
+			 }).update()
 		}
 		
 		
@@ -506,11 +542,11 @@
     </head>
 	<body>
 		<div id="top_panel" class="ui-layout-north">
-			<div style="float: left">
+			<div style="float: left; margin-left: 20px">
 				<h3>Polypeptide escape time calculator</h3>
 			</div>
-			<div style="margin-left: 220px; float:right">
-				<span style="display:inline-block; vertical-align:middle"><br>David P. Hoogerheide<br>Last updated October 23, 2018 </span>
+			<div style="margin-right: 20px; float:right">
+				<span style="display:inline-block; vertical-align:middle">David P. Hoogerheide<br>Last updated October 24, 2018<br><a href=..>Documentation</a></span>
 			</div>
 		</div>
 		<div id="centerplot" class="ui-layout-east">
