@@ -11,7 +11,7 @@ var asynseq = asynseqN2C.split('').reverse().join('');
 var kT = 1.38e-23*300*1e12*1e9; // units are pN nm
 var e = 1.6e-19*1e12*1e9*1e-3; // sets voltage units in mV
 //var laa = 0.4; // length per amino acid in nm; now an input
-var b = 0.6; // Kuhn length in nm; now an input
+//var b = 0.6; // Kuhn length in nm; now an input
 
 function cumsum(array, dx) {
 	//cumulative sum of an array. Like an integral.
