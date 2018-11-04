@@ -35,7 +35,7 @@ function cumsum(array, dx) {
 
 function gaussian(x, x0, sigma) {
 	// return a normalized gaussian	with the appropriate x0 and sigma
-	return math.multiply(math.pow(2*math.PI*math.pow(sigma,2.0), -0.5),math.exp(math.divide(math.subtract(0, math.dotPow(math.subtract(x, x0),2.0)), 2.0*math.pow(sigma, 2.0))));
+	return math.multiply(math.pow(2*math.PI*math.pow(sigma,2.0), -0.5), gaussian_unnorm(x, x0, sigma));
 }
 
 function gaussian_unnorm(x, x0, sigma) {
@@ -310,7 +310,7 @@ function minInRange(x, y, xl, xr) {
 	ysub = math.subset(y, math.index(idxrange))
 	
 	//if result is a single point, return it; otherwise find minimum value
-	return (xsub.length==undefined) ? xsub : xsub[ysub.indexOf(math.min(ysub))]
+	return (xsub.length==undefined) ? [xsub, ysub] : [xsub[ysub.indexOf(math.min(ysub))], math.min(ysub)]
 }
 
 function makeChargeDensityControls(target_id) {
@@ -330,9 +330,9 @@ function makeChargeDensityControls(target_id) {
 				})	
 }
 
-function makePotentialControls(target_id) {
+function makePotentialControls(target_id_right, target_id_left) {
 
-	var exportControls = d3.select("#" + target_id).append('div')
+	var exportControls = d3.select("#" + target_id_right).append('div')
 			.classed("exportControls", true)
 			
 		exportControls
@@ -345,7 +345,24 @@ function makePotentialControls(target_id) {
 					var output = formatOutput(chart2);
 					//console.log(output, d3.tsvFormatRows(output))
 					saveData(d3.tsvFormatRows(output), "potential.txt", "text/tab-separated-values");
-				})	
+				})
+	var injectControls = d3.select("#" + target_id_left).append('div')
+				.classed("injectControls", true)
+				
+		injectControls
+			.append("input")
+			.attr("id", "showInjectionPoints")
+			.attr("type", "checkbox")
+			//.style("zIndex", 0)
+			.property("checked", false)
+			.on("change", function() {
+				update_Uplot();
+				fitPlots();
+			})		
+		injectControls
+			.append("label")
+			.text("Show injection points")
+			
 }
 
 function formatOutput(targetchart) {
@@ -713,7 +730,7 @@ function makeVoltageControls(target_id) {
 	changefunc = update_plots;
 
 	var voltageControls = d3.select("#" + target_id).append('div')
-	    .classed("voltagecontrols", true)
+	    .classed("gencontrols", true)
      voltageControls
 		.append("label")
           .text("Voltage range (mV): ")
@@ -753,7 +770,11 @@ function makeVoltageControls(target_id) {
 	    .classed("mincontrols", true)
       minControls
 		.append("label")
-          .text("Injection point (nm): at potential minimum between ")
+		  .text("Injection point (nm):")
+		  //.style("color", optsx.color1)
+	  minControls
+		.append("label")
+		  .text(" at potential minimum between ")
         .append("input")
 		  .attr("id", "x0min")
 		  .attr("save", true)
@@ -957,7 +978,7 @@ function saveConfig() {
 			})
 	
 	//return JSON.stringify({panels: panels, data: data});
-	output = JSON.stringify({panels: panels, data: data})
+	output = JSON.stringify({panels: panels, data: data}, null, 1)
 	
 	saveData(output, "config.json", "application/json");
 }

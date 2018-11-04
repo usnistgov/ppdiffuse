@@ -133,6 +133,15 @@
 			stroke: orange;
 			stroke-dasharray: 10,2;
 		}
+		
+		.gencontrols {
+			padding: 5px 10px
+		}
+
+		.mincontrols {
+			/*background-color: lightgreen;*/
+			padding: 5px 10px
+		}
 
 		.ui-layout-north {
 			padding: 1px
@@ -167,6 +176,7 @@
 		<script src="https://d3js.org/d3-dispatch.v1.js"></script>  
 		<script src="js/xy-chart.js" charset="utf-8"></script>
 		<script src="js/ppdiffuse.js"></script>
+		<script src="js/x-slice-interactor.js"></script>
 		<script type="text/javascript">
 		
 		plots = {}
@@ -256,7 +266,17 @@
 		elements = {"Barrier": Barrier,
 					"Gaussian": Gaussian,
 					"ConstantF": ConstantF}
-		
+
+		var optsx = {
+			type: "xslice",
+			name: "xslice",
+			show_lines: true,
+			color1: "green",
+			color2: "blue",
+			x1: 5,
+			x2: 10
+		}
+
 		window.onload = function() { 
 	
 			var panelContent = "<h4>General parameters</h4><div id=general></div><h4>Sequence</h4><div id=sequencepanel></div><h4>Pore parameters</h4><div id=pore></div><h4>Entropy</h4><div id=entropy></div>";
@@ -272,7 +292,7 @@
 			//makeGeneralAccordionControls("accordion-head", asynseq)
 			makeVplotControls("plot1_controls_topleft", "plot1_controls_topleft", "plot1_controls_topright", "plot1_controls_left", "plot1_controls_right", labelmap);
 			makeChargeDensityControls("plot3_controls_bottomright")
-			makePotentialControls("plot2_controls_bottomright")
+			makePotentialControls("plot2_controls_bottomright", "plot2_controls_bottomleft")
 			//$("#accordion").accordion("option", "active", 0);
 			makeNewPanel("panel-0", "Barrier")
 			//$("#accordion").accordion("option", "active", "false");
@@ -309,14 +329,20 @@
 				,   center__onresize:   "fitPlots"
 			});
 			
-			update_plots();
+
 			if (layout.state.north.isClosed) {
 				total_height = $('#leftplot').height() + $("#top_panel").height() + $("#bottom_panel").height()
 				layout.sizePane("south", total_height - $("#leftplot").height()-100)
 			}
-			fitPlots();
+
+			//fitPlots();
+			update_plots();
 
 		}
+
+		var Vlabels = [];
+		var data = [];
+		var datax0 = [];
 
 		function update_plots() {
 
@@ -342,8 +368,9 @@
 			var EOFb = Number($("#EOFb").val())
 
 			// Initialize arrays
-			var Vlabels = [];
 			data = [];
+			Vlabels = [];
+
 			var seq = $("#sequence").val().replace(/\s/g, '');
 			var dx = laa/2.0
 			var x = math.range(0, (seq.length)*laa, dx, true).toArray()
@@ -383,7 +410,8 @@
 				dataV = {tesc: [], x0: [], piL: [], piR: [], tescL: [], tescR: []}
 			}
 			
-			// Loop through voltages and calculate escape time parameters
+			datax0 = [];
+			// Loop through voltages and calculate escape time parameters and minimum voltage
 			for (var i=0; i<Vs.length; i++) {
 				V = Vs[i];
 				if (tethered) {
@@ -391,14 +419,17 @@
 					br = barrier1(V, x, chargedensitycorr, laa, b, Lp, Ltether);
 					x = br[0]
 					U = br[1]
-					x0 = (x0min==x0max) ? x0min : minInRange(x, U, x0min, x0max);
+					mins = minInRange(x, U, x0min, x0max)
+					x0 = (x0min==x0max) ? x0min : mins[0];
 					var esct = calcEscapeTime1x(x, x0, U, D, dx)
 					dataV.tesc.push([V, esct])
 					dataV.x0.push([V, x0])
+					datax0.push([x0, mins[1]])
 				} else {
 				
 					U = barrier(V, x, chargedensitycorr, laa);
-					x0 = (x0min==x0max) ? x0min : minInRange(x, U, x0min, x0max);
+					mins = minInRange(x, U, x0min, x0max)
+					x0 = (x0min==x0max) ? x0min : mins[0];
 					var esct = calcEscapeTime2x(x, x0, U, D, dx)
 					dataV.tesc.push([V, esct[4]])
 					dataV.piL.push([V, esct[0]])
@@ -406,33 +437,23 @@
 					dataV.tescL.push([V, esct[2]])
 					dataV.tescR.push([V, esct[3]])
 					dataV.x0.push([V, x0])
+					datax0.push([x0, mins[1]])
 				}
 				
 				// Generate potential profiles
 				dataU = [];
 				for (var j=0; j<x.length;j++) {dataU.push([x[j], U[j]])}
 				data.push(dataU)
-				Vlabels.push({label: String(V) + ' mV'});
+				Vlabels.push({label: String(V) + ' mV', show_line: true, show_points: false});
 			}
+			//data.unshift(datax0)
+			//Vlabels.unshift({label: "Injection points", show_line: false, show_points: true, point_size: 10, color: optsx.color1})
 			
 			update_Vplot()
-			
-			$("#plot2").empty();
-			chart2 = xyChart.default({show_line: true,
-									  show_points: false,
-									  show_errorbars: false,
-									  ytransform: 'linear',
-									  legend: {show: true, left:100, top:10}})
-			c2 = d3.select("#plot2")
-				.data([data])
-				.call(chart2);
-			plots["chart2"] = chart2;
-			chart2.zoomRect(true);
-			chart2.options({axes: {xaxis: {label: 'x (nm)'}, yaxis: {label: 'U (kT)'}},
-							series: Vlabels,
-							margin: { top: 0, right: 80, bottom: 60, left: 0 },
-						}).update()
-			
+
+			optsx.x1 = x0min;
+			optsx.x2 = x0max;
+
 			$("#plot3").empty();
 			chart3 = xyChart.default({show_line: true,
 									  show_points: false,
@@ -448,18 +469,72 @@
 							series: [{label: 'native'}, {label: 'with EOF'}],
 							margin: { top: 0, right: 80, bottom: 60, left: 0 }
 							}).update()
+
+			update_Uplot();
+
+			fitPlots();
 			
 		}
+
+		function update_Uplot() {
+
+				var x_slice = xSliceInteractor.default(optsx);
+				var dataplot = $.extend([], data); //copy
+				var Vlabelsplot = $.extend([], Vlabels);
+
+				showinjection = $("#showInjectionPoints").prop("checked")
+
+				if (showinjection) {
+						dataplot.push(datax0)
+						Vlabelsplot.push({label: "Injection points", show_line: false, show_points: true, point_size: 10, color: optsx.color1})
+				}
+				
+				$("#plot2").empty();
+				chart2 = xyChart.default({show_line: true,
+										show_points: false,
+										show_errorbars: false,
+										ytransform: 'linear',
+										point_size: 5,
+										legend: {show: true, left:125, top:10},
+										axes: {xaxis: {label: 'x (nm)'}, yaxis: {label: 'U (kT)'}},
+										series: Vlabelsplot
+							})
+				c2 = d3.select("#plot2")
+					.data([dataplot])
+					.call(chart2);
+				plots["chart2"] = chart2;
+				chart2.zoomRect(true);
+				if (showinjection) {chart2.interactors(x_slice);}
+				chart2.options({margin: { top: 0, right: 80, bottom: 60, left: 0 }}).update()
+
+				x_slice.dispatch.on("update", function() {
+					var x0min = x_slice.state.x1;
+					var x0max = x_slice.state.x2;
+					if (x0min > x0max) {
+						var tmp = x0max;
+						x0max = x0min;
+						x0min = tmp;
+					}
+					$("#x0min").val(x0min); //nm
+					$("#x0max").val(x0max);
+				});
+
+				x_slice.dispatch.on("drag", function() {
+					$("#accordion").accordion("option", "active", 0);
+					$(".mincontrols").css("background-color", "light" + optsx.color1)
+				})
+
+				x_slice.dispatch.on("end", function() {
+					update_plots()
+					$(".mincontrols").css("background-color", "")
+				});
+
+		}
+
 		//TODO:
 		//Load in everything ONCE, and keep some of the data that don't change (US, seqchargedensity) in memory. Hopefully faster calculation.
-		//Use slice interactor to get minimum x limits?
 		//Add labels for retraction/translocation
 		//Write or find cumtrapz function for javascript and replace all cumsums
-		/*Create a list box of potential elements (imported charge density or an amino acid sequence, any number of gaussians, any number of error functions; 1 entropy function (tethered or not))
-			o Allow addition of new elements
-			o Selecting existing element will change appropriate controls/forms and populate values
-			o How will this work with fitting?
-		*/
 		
 		function fitPlots() {
 			
@@ -545,7 +620,7 @@
 				<h3>Polypeptide escape time calculator</h3>
 			</div>
 			<div style="margin-right: 20px; float:right">
-				<span style="display:inline-block; vertical-align:middle">David P. Hoogerheide<br>Last updated October 24, 2018<br><a href=.#instructions>Documentation</a></span>
+				<span style="display:inline-block; vertical-align:middle">David P. Hoogerheide<br>Last updated November 3, 2018<br><a href=.#instructions>Documentation</a></span>
 			</div>
 		</div>
 		<div id="centerplot" class="ui-layout-east">
@@ -563,7 +638,8 @@
 				<div id="plot3_controls_bottomright" style="float: right; position: absolute"></div>
 			</div>
 			<div id="leftbottomplot" class="ui-layout-south">
-				<div id="plot2" style="float: left"></div>
+				<div id="plot2" style="float: left; position: relative"></div>
+				<div id="plot2_controls_bottomleft" style="float: left; margin-top: -20; position: relative"></div>
 				<div id="plot2_controls_bottomright" style="float: right; position: absolute"></div>
 			</div>
 		</div>
