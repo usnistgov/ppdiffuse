@@ -796,7 +796,10 @@ function makeVoltageControls(target_id) {
 
 function makeVplotControls(target_id_topleft, target_id_topcenter, target_id_topright, target_id_left, target_id_right, labels) {
 	
-	var changefunc = update_Vplot
+	var changefunc = function () {
+		update_Vplot();
+		fitPlots();
+	}
 	
 	var scaleControls = d3.select("#" + target_id_left).append('div')
 	    .classed("scalecontrols", true)
@@ -873,8 +876,9 @@ function makeVplotControls(target_id_topleft, target_id_topcenter, target_id_top
 					expdata[i][0] = -expdata[i][0];
 					expdata[i][2]["xlower"] = -expdata[i][2]["xlower"];
 					expdata[i][2]["xupper"] = -expdata[i][2]["xupper"];
-					update_Vplot()
 				}
+				update_Vplot()
+				fitPlots();
 				})
 				
 	var exportControls = d3.select("#" + target_id_right).append('div')
@@ -912,12 +916,14 @@ function loadData() {
 			//console.log(expdata);
 			//Format for plotting
 			update_Vplot();
+			fitPlots();
 		}
 		reader.readAsText(file);
 	} else {
 		expdata = [];
 		$("#btnReverseV").prop("disabled", true)
 		update_Vplot();
+		fitPlots();
 	}
 }
 
