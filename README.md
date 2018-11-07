@@ -41,7 +41,7 @@ Components include:
 The charge density plot shows the linear charge density of the polyelectrolyte, which determines its interaction with the transmembrane potential. The two curves show the sequence-dependent charge density (determined by the [sequence](#sequence) controls) and the effective charge density (shown after modification with the pore characteristics, as set by the [pore parameters](#pore-parameters) controls). Use the "export" button to export these curves to a tab-separated text file.
 
 #### B. Quasipotential graphic
-The quasipotential plot shows the diffusion potential that serves as input to the Smoluchowski treatment for estimating first passage (escape) times. One curve is shown for each voltage calculated. Use the "Show injection points" checkbox to toggle a draggable slider that displays and controls the window used to search for injection points (see [General parameters](#general_parameters) for more details). Use the "export" button to export these curves to a tab-separated text file.
+The quasipotential plot shows the diffusion potential that serves as input to the Smoluchowski treatment for estimating first passage (escape) times. One curve is shown for each voltage calculated. Use the "Show injection points" checkbox to toggle a draggable slider that displays and controls the window used to search for injection points (see [General parameters](#general-parameters) for more details). Use the "export" button to export these curves to a tab-separated text file.
 
 #### C. Results graphic
 
@@ -53,7 +53,7 @@ The results graphic can allow direct comparison of experimental data (given in a
 
 #### E. [Quasipotential and calculation controls](#Quasipotential-controls)
 
-Contains all of the controls for the quasipotential and calculation. Use the "Save" configuration button to export the entire configuration in a JSON format that can be re-loaded using the "Load" button. Experimental data loaded through the [load data](#load_data) function are saved in the configuration file, but are not linked to the original experimental data file.
+Contains all of the controls for the quasipotential and calculation. Use the "Save" configuration button to export the entire configuration in a JSON format that can be re-loaded using the "Load" button. Experimental data loaded through the [load data](#load-data) function are saved in the configuration file, but are not linked to the original experimental data file.
 
 ### Quasipotential controls
 
