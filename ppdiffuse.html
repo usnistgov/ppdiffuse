@@ -155,17 +155,19 @@
 			padding: .3em .3em .3em .5em;
 		}
 		
-		rect {
-		  fill: none;
-		  user-select: none; 
-		  -webkit-user-select: none; 
-		  -moz-user-select: none;
-		}
-
 		rect.zoom {
 		  stroke: steelblue;
-		  fill-opacity: 0.5;
+		  fill: steelblue;
+		  fill-opacity: 0.1;
 		}
+
+		svg g.hidden, svg path.hidden {
+			display: none;
+		}
+		g.legend rect.hidden {
+			fill-opacity: 0.1;
+		}
+
 	</style>
 		<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script> 
 		<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>						
@@ -280,7 +282,7 @@
 		window.onload = function() { 
 	
 			var panelContent = "<h4>General parameters</h4><div id=general></div><h4>Sequence</h4><div id=sequencepanel></div><h4>Pore parameters</h4><div id=pore></div><h4>Entropy</h4><div id=entropy></div>";
-			$('#accordion').append(panelContent).accordion({collapsible: true, active: false})
+			$('#accordion').append(panelContent)
 
 			makeGeneralAccordionControls("accordion-head");
 			makeGeneralProfileControls("general");
@@ -293,10 +295,7 @@
 			makeVplotControls("plot1_controls_topleft", "plot1_controls_topleft", "plot1_controls_topright", "plot1_controls_left", "plot1_controls_right", labelmap);
 			makeChargeDensityControls("plot3_controls_bottomright")
 			makePotentialControls("plot2_controls_bottomright", "plot2_controls_bottomleft")
-			//$("#accordion").accordion("option", "active", 0);
-			makeNewPanel("panel-0", "Barrier")
-			//$("#accordion").accordion("option", "active", "false");
-			$("#accordion").accordion("option", "active", 0);
+			$("#accordion").accordion({collapsible: true, active: 0});
 	
 			layout = $('body').layout({
 					east__size:			$('body').width()/2
@@ -334,6 +333,11 @@
 				total_height = $('#leftplot').height() + $("#top_panel").height() + $("#bottom_panel").height()
 				layout.sizePane("south", total_height - $("#leftplot").height()-100)
 			}
+
+			
+			makeNewPanel("panel-0", "Barrier")
+			//$("#accordion").accordion("option", "active", "false");
+			$("#accordion").accordion("option", "active", 0);
 
 			//fitPlots();
 			update_plots();
@@ -459,7 +463,7 @@
 									  show_points: false,
 									  show_errorbars: false,
 									  ytransform: 'linear',
-									  legend: {show: true, left:100, top:10}})
+									  legend: {show: true, left:100, top:0}})
 			c3 = d3.select("#plot3")
 				.data([[data_cd, data_cd_corr]])
 				.call(chart3);
@@ -495,7 +499,7 @@
 										show_errorbars: false,
 										ytransform: 'linear',
 										point_size: 5,
-										legend: {show: true, left:125, top:10},
+										legend: {show: true, left:125, top:0},
 										axes: {xaxis: {label: 'x (nm)'}, yaxis: {label: 'U (kT)'}},
 										series: Vlabelsplot
 							})

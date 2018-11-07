@@ -944,26 +944,13 @@ function saveConfig() {
 	
 	var panels = new Object();
 	var data = new Object();
-	
+
+	// save each custom panel (id = panel-*)
 	$('[id^=panel-]').each(function() {
-		/*panels[$(this).attr('id')] = {paneltype: $(this).attr('paneltype'),
-									  data: $(this).find("[save=true]").each(function() {
-										  subdata = Object()
-										  switch ($(this).attr('type')) {
-											  case 'text':
-												 subdata[$(this).attr('id')] = $(this).val();
-												 break;
-											  case 'radio':
-											  case 'checkbox':
-												 subdata[$(this).attr('id')] = $(this).property('checked');
-												 break;
-											  default:
-											}
-											})
-									  }*/
 		panels[$(this).attr('id')] = $(this).attr('paneltype');
 	})
 
+	// save each control marked with a "save" tag
 	$("[save=true]").each(function() {
 		  switch ($(this).attr('type')) {
 			  case 'text':
@@ -977,8 +964,7 @@ function saveConfig() {
 			}
 			})
 	
-	//return JSON.stringify({panels: panels, data: data});
-	output = JSON.stringify({panels: panels, data: data}, null, 1)
+	output = JSON.stringify({panels: panels, data: data, expdata: expdata}, null, 1)
 	
 	saveData(output, "config.json", "application/json");
 }
@@ -1002,14 +988,9 @@ function loadConfig() {
 			})
 			$("#accordion").accordion('destroy').accordion({collapsible: true, active: false});
 			
-			// repopulate accordion with saved values
+			// recreate custom panels
 			for (var key in config["panels"]) {
 				var paneltype = elements[config["panels"][key]].label
-				var data = Object()
-				/*for (var datakey in defaultPanelValues[paneltype]) {
-					data[datakey] = config["data"][datakey + "-" + key]
-					delete config["data"][datakey + "-" + key]
-				}*/
 				makeNewPanel(key, paneltype)
 			}
 			
@@ -1026,6 +1007,10 @@ function loadConfig() {
 					default:
 				}
 			}
+
+			// read in experiment data if saved ("undefined" check is for backwards compatibility)
+			expdata = (config["expdata"] == undefined) ? [] : config["expdata"];
+
 			update_plots()
 		}
 		reader.readAsText(file);
