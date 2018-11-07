@@ -41,7 +41,7 @@ Components include:
 The charge density plot shows the linear charge density of the polyelectrolyte, which determines its interaction with the transmembrane potential. The two curves show the sequence-dependent charge density (determined by the [sequence](#sequence) controls) and the effective charge density (shown after modification with the pore characteristics, as set by the [pore parameters](#pore-parameters) controls). Use the "export" button to export these curves to a tab-separated text file.
 
 #### B. Quasipotential graphic
-The quasipotential plot shows the diffusion potential that serves as input to the Smoluchowski treatment for estimating first passage (escape) times. One curve is shown for each voltage calculated. Use the "export" button to export these curves to a tab-separated text file.
+The quasipotential plot shows the diffusion potential that serves as input to the Smoluchowski treatment for estimating first passage (escape) times. One curve is shown for each voltage calculated. Use the "Show injection points" checkbox to toggle a draggable slider that displays and controls the window used to search for injection points (see [General parameters](#general_parameters) for more details). Use the "export" button to export these curves to a tab-separated text file.
 
 #### C. Results graphic
 
@@ -53,7 +53,7 @@ The results graphic can allow direct comparison of experimental data (given in a
 
 #### E. [Quasipotential and calculation controls](#Quasipotential-controls)
 
-Contains all of the controls for the quasipotential and calculation. Use the "Save" configuration button to export the entire configuration in a JSON format (loaded data are not saved) that can be re-loaded using the "Load" button.
+Contains all of the controls for the quasipotential and calculation. Use the "Save" configuration button to export the entire configuration in a JSON format that can be re-loaded using the "Load" button. Experimental data loaded through the [load data](#load_data) function are saved in the configuration file, but are not linked to the original experimental data file.
 
 ### Quasipotential controls
 
@@ -64,7 +64,7 @@ The calculation and quasipotential controls are divided into panels. The descrip
 ![general_parameters](./docs/general_parameters.jpg)
 + The diffusion constant is assumed independent of position and thus acts as a scaling factor on the time scale of the calculation. This value is appropriate only for the VDAC channel but is a good starting point for polypeptides in channels of a similar size.
 + The voltage range sets the transmembrane potentials at which the calculation should be performed.
-+ The injection point is the position at which the polyelectrolyte is first detected. If there is one, the potential minimum should be chosen as the starting point. The potential minimum between the values given here is used as the injection point. If the values are set to be the same, that value is used as the injection point.
++ The injection point is the position at which the polyelectrolyte is first detected. If there is one, the potential minimum should be chosen as the starting point. The potential minimum between the values given here is used as the injection point. If the values are set to be the same, that value is used as the injection point. The "Show injection points" checkbox will toggle a graphical display of the window used for the injection point search as well as the injection points. The vertical lines can be dragged to graphically adjust the search window, and the injection points will update when the drag is complete.
 
 #### Sequence
 
