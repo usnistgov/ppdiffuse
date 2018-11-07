@@ -368,16 +368,17 @@ function makePotentialControls(target_id_right, target_id_left) {
 function formatOutput(targetchart) {
 	var labels = targetchart.options().series;
 	var data = targetchart.source_data();
+	var offset = (labels[labels.length-1]["label"] == injectlabel) ? 1 : 0
 	var row = [];
 	var headerrow = ["x (nm)"];
 	var output = [];
-	for (var i = 0; i < labels.length; i++) {
+	for (var i = 0; i < labels.length-offset; i++) {
 		headerrow.push(labels[i]["label"])
 	}
 	output.push(headerrow)
 	for (var j = 0; j < data[0].length; j++) {
 		row.push(data[0][j][0]);
-		for (var i = 0; i < data.length; i++) {
+		for (var i = 0; i < data.length-offset; i++) {
 			row.push(data[i][j][1]);
 		}
 		output.push(row);

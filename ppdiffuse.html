@@ -279,6 +279,8 @@
 			x2: 10
 		}
 
+		var injectlabel = "Injection points"
+
 		window.onload = function() { 
 	
 			var panelContent = "<h4>General parameters</h4><div id=general></div><h4>Sequence</h4><div id=sequencepanel></div><h4>Pore parameters</h4><div id=pore></div><h4>Entropy</h4><div id=entropy></div>";
@@ -490,7 +492,7 @@
 
 				if (showinjection) {
 						dataplot.push(datax0)
-						Vlabelsplot.push({label: "Injection points", show_line: false, show_points: true, point_size: 10, color: optsx.color1})
+						Vlabelsplot.push({label: injectlabel, show_line: false, show_points: true, color: optsx.color1})
 				}
 				
 				$("#plot2").empty();
@@ -498,7 +500,7 @@
 										show_points: false,
 										show_errorbars: false,
 										ytransform: 'linear',
-										point_size: 5,
+										point_size: 4,
 										legend: {show: true, left:125, top:0},
 										axes: {xaxis: {label: 'x (nm)'}, yaxis: {label: 'U (kT)'}},
 										series: Vlabelsplot
