@@ -877,8 +877,7 @@ function makeVplotControls(target_id_topleft, target_id_topcenter, target_id_top
 					expdata[i][2]["xlower"] = -expdata[i][2]["xlower"];
 					expdata[i][2]["xupper"] = -expdata[i][2]["xupper"];
 				}
-				update_Vplot()
-				fitPlots();
+				changefunc();
 				})
 				
 	var exportControls = d3.select("#" + target_id_right).append('div')
@@ -897,6 +896,12 @@ function makeVplotControls(target_id_topleft, target_id_topcenter, target_id_top
 }
 
 function loadData() {
+
+	var changefunc = function () {
+		update_Vplot();
+		fitPlots();
+	}
+
 	var file = document.getElementById("datafile").files[0]; // only one file allowed
 	if (file) {
 		datafilename = file.name;
@@ -915,15 +920,13 @@ function loadData() {
 			$("#btnReverseV").prop("disabled", false)
 			//console.log(expdata);
 			//Format for plotting
-			update_Vplot();
-			fitPlots();
+			changefunc();
 		}
 		reader.readAsText(file);
 	} else {
 		expdata = [];
 		$("#btnReverseV").prop("disabled", true)
-		update_Vplot();
-		fitPlots();
+		changefunc();
 	}
 }
 
