@@ -6,6 +6,7 @@
 ---
 ### References
 + Hoogerheide et al., *Biophysical Journal* 2018. "Real-Time Nanopore-Based Recognition of Protein Translocation Success." [doi:10.1016/j.bpj.2017.12.019](https://doi.org/10.1016/j.bpj.2017.12.019)
++ Rostovtseva et al., *J. Biol. Chem* 2018. "Sequence diversity of tubulin isotypes in regulation of the mitochondrial voltage-dependent anion channel." [doi:10.1074/jbc.RA117.001569](https://doi.org/10.1074/jbc.RA117.001569)
 + Hoogerheide et al., *Nanoscale* 2017. "Mechanism of α-synuclein translocation through a VDAC nanopore revealed by energy landscape modeling of escape time distributions." [doi:10.1039/C6NR08145B](https://doi.org/10.1039/C6NR08145B)
 + Hoogerheide et al., *Phys. Rev. Lett.* 2013. "Escape of DNA from a Weakly Biased Thin Nanopore: Experimental Evidence for a Universal Diffusive Behavior." [doi:10.1103/PhysRevLett.111.248301](https://doi.org/10.1103/PhysRevLett.111.248301)
 + Lu et al., *Phys. Rev. E* 2012. "Effective driving force applied on DNA inside a solid-state nanopore." [doi:10.1103/PhysRevE.86.011921](https://doi.org/10.1103/PhysRevE.86.011921)
