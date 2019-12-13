@@ -125,7 +125,6 @@
       if (options.show_errorbars) {
         max_y = d3.extent(merged_data, function (d) {
           var yy = d[2] && d[2].yupper != undefined && !(isNaN(d[2].yupper)) ? d[2].yupper : d[1];
-          console.log(d, yy)
           return isFinite(y(yy)) ? yy : null;
         })[1];
         console.log(max_y)
