@@ -465,14 +465,16 @@
 									  show_points: false,
 									  show_errorbars: false,
 									  ytransform: 'linear',
-									  legend: {show: true, left:100, top:0}})
+									  legend: {show: true, left:100, top:0 },
+									  axes: {xaxis: {label: 'x (nm)'}, yaxis: {label: 'Charge density (e/nm)'}},
+									  series: [{label: 'native'}, {label: 'with EOF'}]
+									})
 			c3 = d3.select("#plot3")
 				.data([[data_cd, data_cd_corr]])
 				.call(chart3);
 			plots["chart3"] = chart3;
 			chart3.zoomRect(true);
-			chart3.options({axes: {xaxis: {label: 'x (nm)'}, yaxis: {label: 'Charge density (e/nm)'}},
-							series: [{label: 'native'}, {label: 'with EOF'}],
+			chart3.options({
 							margin: { top: 0, right: 80, bottom: 60, left: 0 }
 							}).update()
 
