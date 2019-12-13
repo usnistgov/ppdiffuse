@@ -28,7 +28,7 @@ This calculator derives from the modeling work given in the references, in which
 
 Other forces, such as localized barriers or binding potential wells, could also be present. The current calculator includes barriers (error functions), Gaussians, and constant forces, but can easily be extended to include any contribution to the diffusion potential.
 
-The escape times and probabilities are calculated by applying the Smoluchowski equation to the diffusion potential, assuming a constant diffusion constant.
+The escape times and probabilities are calculated by applying the Smoluchowski equation to the diffusion potential, assuming a position-independent diffusion constant.
 
 # Instructions
 
