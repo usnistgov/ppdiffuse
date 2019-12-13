@@ -121,21 +121,24 @@
     function do_autoscale() {
       var extents;
       var merged_data = d3.merge(source_data);
+      console.log(merged_data)
       if (options.show_errorbars) {
         max_y = d3.extent(merged_data, function (d) {
-          var yy = d[2] && d[2].yupper != undefined ? d[2].yupper : d[1];
+          var yy = d[2] && d[2].yupper != undefined && !(isNaN(d[2].yupper)) ? d[2].yupper : d[1];
+          console.log(d, yy)
           return isFinite(y(yy)) ? yy : null;
         })[1];
+        console.log(max_y)
         min_y = d3.extent(merged_data, function (d) {
-          var yy = d[2] && d[2].ylower != undefined ? d[2].ylower : d[1];
+          var yy = d[2] && d[2].ylower != undefined && !(isNaN(d[2].ylower)) ? d[2].ylower : d[1];
           return isFinite(y(yy)) ? yy : null;
         })[0];
         max_x = d3.extent(merged_data, function (d) {
-          var xx = d[2] && d[2].xupper != undefined ? d[2].xupper : d[0];
+          var xx = d[2] && d[2].xupper != undefined && !(isNaN(d[2].xupper)) ? d[2].xupper : d[0];
           return isFinite(x(xx)) ? xx : null;
         })[1];
         min_x = d3.extent(merged_data, function (d) {
-          var xx = d[2] && d[2].xlower != undefined ? d[2].xlower : d[0];
+          var xx = d[2] && d[2].xlower != undefined && !(isNaN(d[2].xlower)) ? d[2].xlower : d[0];
           return isFinite(x(xx)) ? xx : null;
         })[0];
       } else {
