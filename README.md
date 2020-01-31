@@ -6,6 +6,7 @@
 
 # Polypeptide diffusion calculator (ppdiffuse)
 ## *Web-based calculator for voltage-driven transport of polypeptides through nanopores*
+### [David P. Hoogerheide](https://www.nist.gov/people/david-p-hoogerheide), [NIST Center for Neutron Research](https://ncnr.nist.gov)
 
 <div style="margin: 40px 0px 40px 0px"><h2><a href="./ppdiffuse.html" style="color: #252525; background-color: violet; border: 20px solid violet">Load calculator</a></h2></div>
 
