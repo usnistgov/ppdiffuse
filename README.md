@@ -44,7 +44,7 @@ The escape times and probabilities are calculated by applying the Smoluchowski e
 ### Calculator interface
 
 The default calculator view is shown here:
-![screenshot](./docs/ppdiffuse_screenshot.jpg)
+![screenshot](docs/ppdiffuse_screenshot.jpg)
 
 Components include:
 #### A. Charge density graphic 
@@ -53,7 +53,7 @@ The charge density plot shows the linear charge density of the polyelectrolyte, 
 #### B. Quasipotential graphic
 The quasipotential plot shows the diffusion potential that serves as input to the Smoluchowski treatment for estimating first passage (escape) times. One curve is shown for each voltage calculated. Use the "export" button to export these curves to a tab-separated text file. Use the "Show injection points" checkbox to toggle a draggable slider that displays and controls the window used to search for injection points (see [General parameters](#general-parameters) for more details), as shown here:
 
-![quasipotential_withinjectionpoints](./docs/withinjectionpoints.jpg)
+![quasipotential_withinjectionpoints](docs/withinjectionpoints.jpg)
 
 #### C. Results graphic
 
@@ -73,14 +73,14 @@ The calculation and quasipotential controls are divided into panels. The descrip
 
 #### General parameters
 
-![general_parameters](./docs/general_parameters.jpg)
+![general_parameters](docs/general_parameters.jpg)
 + The diffusion constant is assumed independent of position and thus acts as a scaling factor on the time scale of the calculation. This value is appropriate only for the VDAC channel but is a good starting point for polypeptides in channels of a similar size.
 + The voltage range sets the transmembrane potentials at which the calculation should be performed.
 + The injection point is the position at which the polyelectrolyte is first detected. If there is one, the potential minimum should be chosen as the starting point. The potential minimum between the values given here is used as the injection point. If the values are set to be the same, that value is used as the injection point. The "Show injection points" checkbox in the [quasipotential graphic](#b-quasipotential-graphic) will toggle a graphical display of the window used for the injection point search as well as the injection points. The vertical lines can be dragged to graphically adjust the search window, and the injection points will update when the drag is complete.
 
 #### Sequence
 
-![sequence](./docs/sequence.jpg)
+![sequence](docs/sequence.jpg)
 + The polypeptide sequence determines both the length of the diffusion region (0.4 nm per amino acid) and the charge density profile in the [charge density graphic](#a-charge-density-graphic). Spaces are ignored. Lysine (K), arginine (R), and histidine (H) residues are assigned +1 charges, while aspartic (D) and glutamic (E) acid residues are assigned -1. An Alexa 488 tag (X) is assigned a -2 charge.
 + The polypeptide always translocates from left to right, so the "reverse" button reverses the amino acid order.
 + The "direction" control determines which end of the molecule is the N (which carries an extra +1 charge) and which is the C (which carries an extra -1 charge) terminus.
@@ -89,19 +89,19 @@ The calculation and quasipotential controls are divided into panels. The descrip
 
 
 #### Pore parameters
-![pore_parameters](./docs/pore_parameters.jpg)
+![pore_parameters](docs/pore_parameters.jpg)
 + The pore length is implemented as the FWHM of a Gaussian filter used to smooth the charge density profile. This accounts for the fact that multiple residues will be in the pore simultaneously.
 + The electroosmotic slope and intercept parameters describe the modification of the charge density due to its disruption of the electroosmotic flow in the nanopore. The slope is essentially the fraction of the charge density that is not counteracted by the electrokinetic flow; the intercept is proportional to the effective charge density of the empty pore. For VDAC, which has a positively charged pore lumen, this value is negative, and indicates that a charge density of -0.18 e/nm is required to electrostatically cancel the pore lumen charges. The slope of 0.908 indicates that the effective charge density acted on by the electric field is approximately 90%. For DNA in solid-state nanopores, where hydrodynamic flow plays a larger role than in the more confined biological nanopores, this value can be [as low as 0.1](https://doi.org/10.1103/PhysRevE.86.011921).
 
 #### Entropy
-![entropy](./docs/entropy.jpg)
+![entropy](docs/entropy.jpg)
 The entropy controls extend the calculator to treat tethered polyelectrolytes (*i.e.* when translocation is known to be impossible).
 + The entropy function is rather different in the tethered case, and turning on the tethering option applies the appropriate entropy function. Note that this function uses the "Kuhn length" parameter in the [sequence](#sequence) panel.
 + The tether length is a sensitive parameter that sets the maximum extension of the tethered polyelectrolyte.
 
 #### Custom quasipotential elements
 
-![addnew](./docs/addnew.jpg)
+![addnew](docs/addnew.jpg)
 
 The "Add new: " button allows custom elements to be added to the quasipotential. These include barrier (error function), gaussian, and constant force elements. The fields are self-explanatory, so only "barrier" is shown here. 
 
@@ -109,7 +109,7 @@ Each custom element can be removed from the calculation using the "delete" butto
 
 ##### Barrier element
 
-![barrier](./docs/barrier.jpg)
+![barrier](docs/barrier.jpg)
 
 A barrier element adds an error function of the given height (negative reduces the direction of the barrier), width (sigma), and position along the polypeptide. This is useful for membrane tethering. Two of them with equal and opposite heights can be combined to create a potential plateau.
 
