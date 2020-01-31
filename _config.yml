@@ -4,6 +4,7 @@ description: "Web-based calculator for voltage-driven transport of polypeptides 
 baseurl: "/ppdiffuse"
 rooturl: ""
 
+theme: jekyll-theme-midnight
 markdown: kramdown
 permalink: pretty
 encoding: UTF-8
