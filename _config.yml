@@ -1,1 +1,10 @@
-theme: jekyll-theme-midnight
+title: Polypeptide diffusion calculator (ppdiffuse)
+description: "Web-based calculator for voltage-driven transport of polypeptides through nanopores"
+
+baseurl: "/ppdiffuse"
+rooturl: ""
+
+markdown: kramdown
+permalink: pretty
+
+include: [docs]
