@@ -18,12 +18,6 @@
 
 <div style="margin: 40px 0px 40px 0px"><h2><a href="./ppdiffuse.html" style="color: #252525; background-color: violet; border: 20px solid violet">Load calculator</a></h2></div>
 
-<div>
-<nav>
-    <li class="fork"><a href="{{ site.github.repository_url }}">View On GitHub</a></li>
-</nav>
-</div>
-
 ---
 ### References
 + Hoogerheide et al., *Biophysical Journal* 2018. "Real-Time Nanopore-Based Recognition of Protein Translocation Success." [doi:10.1016/j.bpj.2017.12.019](https://doi.org/10.1016/j.bpj.2017.12.019)
