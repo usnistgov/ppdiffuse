@@ -15,5 +15,6 @@ $(document).ready(function(){
     // Add leaveNotice to external A elements 
     $('a.external').leaveNotice({
       siteName: 'the ppdiffuse calculator',
+      newWindow: true
     });
   });
