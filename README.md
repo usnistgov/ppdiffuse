@@ -1,36 +1,10 @@
 <HEAD>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
-<script src="https://pages.nist.gov/nist-header-footer/js/jquery-1.9.0.min.js" type="text/javascript" defer="defer"></script>
-<script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
-<script async type="text/javascript" id="_fed_an_ua_tag" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-42404149-54&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c">
-</script>
-
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
-<script type="text/javascript">
-$(document).ready(function(){
-  // Mark external (non-nist.gov) A tags with class "external"
-  //If the adress start with https and ends with nist.gov
-  var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)'); 
-  //Regex to find address that start with https 
-  var re_absolute_address = new RegExp('^((https?:)?\/\/)');
-  $("a").each(function(){
-    var url=$(this).attr('href'); 
-    if(re_nist.test(url) || !re_absolute_address.test(url)){
-      $(this).addClass('local'); 
-    }else{
-      $(this).addClass('external');
-    } 
-  });
-  // Add leaveNotice to external A elements 
-  $('a.external').leaveNotice({
-    siteName: 'PPdiffuse Calculator Site',
-  });
-});
-</script>
-
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
+    <script src="https://pages.nist.gov/nist-header-footer/js/jquery-1.9.0.min.js" type="text/javascript" defer="defer"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
+    <script async type="text/javascript" id="_fed_an_ua_tag" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=NIST&subagency=github&pua=UA-42404149-54&yt=true&exts=ppsx,pps,f90,sch,rtf,wrl,txz,m1v,xlsm,msi,xsd,f,tif,eps,mpg,xml,pl,xlt,c">
+    </script>
 </HEAD>
 
 # Polypeptide diffusion calculator (ppdiffuse)
@@ -152,3 +126,27 @@ A constant force element adds a constant slope to the quasipotential. The beginn
 
 Creation of this calculator would not have been possible without support from [Brian Maranville](https://bmaranville.github.io/), particularly his excellent [implementation of D3](https://bmaranville.github.io/d3-science-v4/) for scientific plotting.
 
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+<script type="text/javascript">
+$(document).ready(function(){
+  // Mark external (non-nist.gov) A tags with class "external"
+  //If the adress start with https and ends with nist.gov
+  var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)'); 
+  //Regex to find address that start with https 
+  var re_absolute_address = new RegExp('^((https?:)?\/\/)');
+  $("a").each(function(){
+    var url=$(this).attr('href'); 
+    if(re_nist.test(url) || !re_absolute_address.test(url)){
+      $(this).addClass('local'); 
+    }else{
+      $(this).addClass('external');
+    } 
+  });
+  // Add leaveNotice to external A elements 
+  $('a.external').leaveNotice({
+    siteName: 'PPdiffuse Calculator Site',
+  });
+});
+</script>
