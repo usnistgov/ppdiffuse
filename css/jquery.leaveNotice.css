@@ -26,7 +26,7 @@
 
 /* This style is applied to the link that closes the dialog. */
 a#ln-cancelLink {background-color:#000; font-weight:bold; padding:5px; color:#666; text-decoration:none; text-transform:uppercase; font-size:0.8em;}
-a#ln-cancelLink:hover {background-color:#000; color:#000;}
+a#ln-cancelLink:hover {background-color:#000; color:#e6e6e6;}
 
 /* This style is for the box that holds the section that says where the user is being directed to. */
-.setoff {background-color:#f2f2f2; padding:5px; margin:10px 0 20px 0;}
+.setoff {background-color:#000; padding:5px; margin:10px 0 20px 0;}
