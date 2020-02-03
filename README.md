@@ -7,7 +7,7 @@
 </script>
 
 <script type="text/javascript" src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js" defer></script>
-<link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+<link rel="stylesheet" type="text/css" href="./css/jquery.leaveNotice.css" />
 <script src="localleaveNotice.js" defer></script>
 
 </HEAD>
