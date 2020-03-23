@@ -14,7 +14,8 @@ var e = 1.6e-19*1e12*1e9*1e-3; // sets voltage units in mV
 //var b = 0.6; // Kuhn length in nm; now an input
 
 function cumsum(array, dx) {
-	//cumulative sum of an array. Like an integral.
+    //cumulative trapezoidal integral of an array. Produces array with 1-larger dimension than input
+    // vector, so uses an average to remove the extra element in an unbiased way.
 	
 	var dx = dx || 1.0
 	
@@ -22,7 +23,7 @@ function cumsum(array, dx) {
 		if (r.length > 0) a += r[r.length - 1];
 		r.push(a);
         return r;
-		}, []);
+		}, [0]);
 	
 	/*runsum = 0;
 	for (var i = 0; i<array.length; i++) {
@@ -30,7 +31,7 @@ function cumsum(array, dx) {
 		array[i] = runsum;
 	}*/
 	
-	return math.multiply(array, dx)
+	return math.multiply(0.5, math.add(array.slice(0,-1), array.slice(1,array.length)), dx)
 }
 
 function gaussian(x, x0, sigma) {
@@ -52,7 +53,7 @@ function US(x, laa) {
 	
 	maxx = x[x.length-1]
 	maxxp = maxx + 2*laa
-	pre = 0.59*kT
+	pre = 0.59
 	xplaa = math.add(x, laa)
 	x2 = math.divide(xplaa, maxxp)
 	
@@ -178,6 +179,11 @@ function interp(xf, xi, yi) {
 	return (xf.length==1) ? yf[0] : yf
 }
 
+function useentropy() {
+    // returns 1 if "Use entropy?" checkbox is checked, 0 otherwise.
+    return +$("#useentropycheck").prop("checked")
+}
+
 function barrier(V, x, chargedensity, laa) {
 
 	//var protseq = seq2charge(seq, N2C);
@@ -185,8 +191,8 @@ function barrier(V, x, chargedensity, laa) {
 	var dx = (x[x.length-1] - x[0])/(x.length-1);	
 	Ue = math.multiply(cumsum(chargedensity, dx), e*V/kT, 1.);
 	//document.write(math.min(Ue), '<br>')
-	//U = math.add(Ue, math.multiply(1., US(x, laa)), math.multiply(1*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x), math.multiply(25, gaussian(x, 5., wb/2.3)))
-	U = math.add(Ue, math.multiply(1., US(x, laa)), get_barrier_components(x, dx))
+    //U = math.add(Ue, math.multiply(1., US(x, laa)), math.multiply(1*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x), math.multiply(25, gaussian(x, 5., wb/2.3)))
+    U = math.add(Ue, math.multiply(useentropy(), US(x, laa)), get_barrier_components(x, dx))
 	//U = math.add(Ue, math.multiply(1., US1(x, 0.6, 4.0, 2.0)), math.multiply(0*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x))
 	U = math.subtract(U, U[0])
 	return U
@@ -202,7 +208,7 @@ function barrier1(V, x, chargedensity, laa, b, Lp, Ltether) {
 	//U = math.add(Ue, math.multiply(1., US(x, laa)), math.multiply(1*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x))
 	entropy = US1(x, Lp, Ltether, b)
 	//U = math.add(Ue, math.multiply(1., entropy[0]), math.multiply(1*Eb, erf(x, xb, wb, dx)), math.multiply(1*fu, x))
-	U = math.add(Ue, math.multiply(1., entropy[0]), get_barrier_components(x, dx))
+	U = math.add(Ue, math.multiply(useentropy(), entropy[0]), get_barrier_components(x, dx))
 	x = math.filter(x, function (v, i) {return entropy[1][i]})
 	x = math.subtract(x, x[0])
 	U = math.filter(U, function (v, i) {return entropy[1][i]})
@@ -680,7 +686,18 @@ function makeEntropyControls(target_id) {
       
       var modeControls = d3.select("#" + target_id).append('div')
          .classed("modecontrols", true)
-		 
+      
+      var modeControls2 = modeControls.append('div').classed("modecontrols", true)
+      modeControls2
+        .append("input")
+        .attr("id", "useentropycheck")
+        .attr("save", true)
+        .attr("type", "checkbox")
+        .property("checked", true)
+        .on("change", changefunc)
+      modeControls2
+        .append("label")
+        .text("Use entropy? ")
       modeControls
 		.append("input")
 		.attr("id", "tethercheck")
