@@ -145,14 +145,21 @@ function seq2chargex(seq, N2C, x, laa, sigma) {
 	// sigma is the width of the Gaussian convolution function
 	var numarray = seq2charge(seq, N2C);
 	var dx = (x[x.length-1] - x[0])/(x.length-1);
+    var x0 = 0;
+    var nsigma = 3;
 	//var dx = (x[x.length-1] - x[0])/numarray.length;
 	y = math.zeros(x.length).toArray();
 	for (var i = 0; i<numarray.length; i++) {
-		dy = gaussian(x, (i + 0.5)*laa, sigma);
-		y = math.add(y, math.multiply(numarray[i], dy, 1/(math.sum(dy)*dx)))
+        x0 = (i + 0.5)*laa
+        xsub = math.filter(x, (function crit(x) {return ((x>=(x0-nsigma*sigma)) && (x<=(x0+nsigma*sigma)))}))
+        idxrange = math.range(x.indexOf(xsub[0]), x.indexOf(xsub[xsub.length-1])+1)
+        ysub = math.subset(y, math.index(idxrange))
+        dy = gaussian(xsub, x0, sigma);
+		y = math.subset(y, math.index(idxrange), math.add(ysub, math.multiply(numarray[i], dy, 1/(math.sum(dy)*dx))))
 		//document.write(x[i], ' ', numarray[i], ' ', y[i], '<br>')
 	}
 	//document.write(y)
+    //console.log(y)
 	return y
 }
 
@@ -310,12 +317,18 @@ function minInRange(x, y, xl, xr) {
 	// requires at least 3 total points
 	
 	idxs = math.range(0, x.length).toArray()
-	xcrit = math.filter(x, (function crit(x) {return ((x>=xl) && (x<=xr))}))
-    idxrange = math.range(x.indexOf(xcrit[0]), x.indexOf(xcrit[xcrit.length-1])+1)
-	xsub = math.subset(x, math.index(idxrange))
-	ysub = math.subset(y, math.index(idxrange))
-	
-	//if result is a single point, return it; otherwise find minimum value
+    xcrit = math.filter(x, (function crit(x) {return ((x>=xl) && (x<=xr))}))
+    if (xcrit.length < 1) {
+        // if no results (no points in range), then interpolate the average of the boundaries into y
+        xsub = 0.5*(xl + xr)
+        ysub = interp(xsub, x, y)
+    } else {
+        idxrange = math.range(x.indexOf(xcrit[0]), x.indexOf(xcrit[xcrit.length-1])+1)
+        xsub = math.subset(x, math.index(idxrange))
+        ysub = math.subset(y, math.index(idxrange))
+    }
+
+    //if result is a single point, return it; otherwise find minimum value
 	return (xsub.length==undefined) ? [xsub, ysub] : [xsub[ysub.indexOf(math.min(ysub))], math.min(ysub)]
 }
 
