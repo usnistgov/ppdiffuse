@@ -150,12 +150,15 @@ function seq2chargex(seq, N2C, x, laa, sigma) {
 	//var dx = (x[x.length-1] - x[0])/numarray.length;
 	y = math.zeros(x.length).toArray();
 	for (var i = 0; i<numarray.length; i++) {
-        x0 = (i + 0.5)*laa
-        xsub = math.filter(x, (function crit(x) {return ((x>=(x0-nsigma*sigma)) && (x<=(x0+nsigma*sigma)))}))
-        idxrange = math.range(x.indexOf(xsub[0]), x.indexOf(xsub[xsub.length-1])+1)
-        ysub = math.subset(y, math.index(idxrange))
-        dy = gaussian(xsub, x0, sigma);
-		y = math.subset(y, math.index(idxrange), math.add(ysub, math.multiply(numarray[i], dy, 1/(math.sum(dy)*dx))))
+        // for speed, only do calculation if we're not going to multiply by zero at the end!
+        if (numarray[i] !== 0.0) {
+            x0 = (i + 0.5)*laa
+            xsub = math.filter(x, (function crit(x) {return ((x>=(x0-nsigma*sigma)) && (x<=(x0+nsigma*sigma)))}))
+            idxrange = math.range(x.indexOf(xsub[0]), x.indexOf(xsub[xsub.length-1])+1)
+            ysub = math.subset(y, math.index(idxrange))
+            dy = gaussian(xsub, x0, sigma);
+            y = math.subset(y, math.index(idxrange), math.add(ysub, math.multiply(numarray[i], dy, 1/(math.sum(dy)*dx))))
+        }
 		//document.write(x[i], ' ', numarray[i], ' ', y[i], '<br>')
 	}
 	//document.write(y)
