@@ -427,7 +427,7 @@ function makeGeneralProfileControls(target_id) {
 		  .attr("save", true)
           .attr("type", "text")
           .attr("name", "D")
-          .attr("value", 0.4)
+          .attr("value", 0.309)
 		  .on("change", changefunc)
 /*	  genControls
 		.append("li")
@@ -469,7 +469,7 @@ function makePoreControls(target_id) {
 		  .attr("save", true)
           .attr("type", "text")
           .attr("name", "EOFm")
-          .attr("value", 0.908)
+          .attr("value", 0.654)
 		  .on("change", changefunc)
 	  poreControls
    	    .append("li")
@@ -479,7 +479,7 @@ function makePoreControls(target_id) {
 		  .attr("save", true)
           .attr("type", "text")
           .attr("name", "EOFb")
-          .attr("value", -0.18)
+          .attr("value", -0.21)
 		  .on("change", changefunc)
       
 }
